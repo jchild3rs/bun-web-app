@@ -1,0 +1,32 @@
+{
+  "name": "vanilla-web-app",
+  "type": "module",
+  "scripts": {
+    "prepare": "panda codegen",
+    "dev": "bun run conc -n css,js --kill-others \"bun run dev:css\" \"bun run dev:js\"",
+    "dev:css": "bun panda --watch",
+    "dev:js": "bun run nodemon --exec='bun run scripts/bundle.ts && DEBUG=* bun --hot ./src/server.ts'",
+    "bundle": "bun run conc -n css,js \"bun run bundle:css\" \"bun run bundle:js\"",
+    "bundle:css": "bun panda",
+    "bundle:js": "bun scripts/bundle.ts",
+    "check": "biome check --apply src",
+    "start": "NODE_ENV=production bun run bundle && COMPRESSION_ENABLED=1 NODE_ENV=production bun run dist/server.js"
+  },
+  "dependencies": {
+    "@fontsource/fira-code": "^5.0.16",
+    "debug": "^4.3.4",
+    "fast-glob": "^3.3.2",
+    "path-to-regexp": "^6.2.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "@pandacss/dev": "^0.23.0",
+    "@types/debug": "^4.1.12",
+    "bun-types": "latest",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
