@@ -1,5 +1,5 @@
 import { Route } from "../common/router/route";
-import { HtmlTemplateResponse } from "../common/server/html-template-response.ts";
+import { HtmlTemplateResponse } from "../common/server/html-template-response";
 import { fetchPosts } from "../post/post.service";
 import { homeView } from "./home.view";
 

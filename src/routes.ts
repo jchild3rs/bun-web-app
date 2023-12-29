@@ -1,11 +1,11 @@
-import { postListPartialRoute } from "@lib/post/post-list/post-list.partial.route.ts";
-import { homePageRoute } from "@lib/home/home.route.ts";
-import { searchRoute } from "@lib/search/search.route.ts";
-import { postPageRoute } from "@lib/post/post.route.ts";
-import { postPartialRoute } from "@lib/post/post.partial.route.ts";
-import { opsEnvRoute } from "@lib/ops/env.route.ts";
-import { Route } from "@lib/common/router/route.ts";
-import { applyCacheControlHeaders } from "@lib/common/server/cache-control.ts";
+import { Route } from "@lib/common/router/route";
+import { createCacheControlHeaders } from "@lib/common/server/cache-control";
+import { homePageRoute } from "@lib/home/home.route";
+import { opsEnvRoute } from "@lib/ops/env.route";
+import { postListPartialRoute } from "@lib/post/post-list/post-list.partial.route";
+import { postPartialRoute } from "@lib/post/post.partial.route";
+import { postPageRoute } from "@lib/post/post.route";
+import { searchRoute } from "@lib/search/search.route";
 
 const staticAssetRoute = new Route<{ file: string[]; extension: string }>(
 	"/:file*.:extension",
@@ -14,9 +14,10 @@ const staticAssetRoute = new Route<{ file: string[]; extension: string }>(
 			params.extension
 		}`;
 
-		applyCacheControlHeaders(request);
+		const pathname = new URL(request.url).pathname;
+		const headers = createCacheControlHeaders(pathname);
 
-		return new Response(Bun.file(filePath), { headers: request.headers });
+		return new Response(Bun.file(filePath), { headers });
 	},
 );
 

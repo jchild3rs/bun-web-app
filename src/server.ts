@@ -1,8 +1,8 @@
 import { Router } from "@lib/common/router/router";
-import { ErrorResponse } from "@lib/common/server/error-response.ts";
-import { NotFoundResponse } from "@lib/common/server/not-found-response.ts";
+import { ErrorResponse } from "@lib/common/server/error-response";
+import { NotFoundResponse } from "@lib/common/server/not-found-response";
 
-import { routes } from "./routes.ts";
+import { routes } from "./routes";
 
 const debug = require("debug")("server");
 const router = new Router(routes);

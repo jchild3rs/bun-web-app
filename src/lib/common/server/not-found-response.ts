@@ -1,5 +1,5 @@
-import { notFoundView } from "../views/not-found.view.ts";
-import { HtmlTemplateResponse } from "./html-template-response.ts";
+import { notFoundView } from "../views/not-found.view";
+import { HtmlTemplateResponse } from "./html-template-response";
 
 export class NotFoundResponse extends HtmlTemplateResponse {
 	constructor() {

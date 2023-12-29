@@ -1,7 +1,7 @@
 import { Route } from "../common/router/route";
-import { HtmlTemplateResponse } from "../common/server/html-template-response.ts";
+import { HtmlTemplateResponse } from "../common/server/html-template-response";
 import { searchPosts } from "../post/post.service";
-import { searchFormView } from "./search-form.view.ts";
+import { searchFormView } from "./search-form.view";
 
 export const searchRoute = new Route("/search", async ({ request }) => {
 	const url = new URL(request.url);

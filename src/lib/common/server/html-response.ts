@@ -1,16 +1,15 @@
 export class HtmlResponse extends Response {
-	constructor(html: string, options?: ResponseInit) {
+	constructor(html: string) {
 		const maybeCompressedHtml = Bun.env.COMPRESSION_ENABLED
 			? Bun.gzipSync(Buffer.from(html))
 			: html;
 
-		super(maybeCompressedHtml, {
-			...options,
-			headers: {
-				...options?.headers,
-				"Content-Type": "text/html",
-				...(Bun.env.COMPRESSION_ENABLED && { "Content-Encoding": "gzip" }),
-			},
-		});
+		const headers = new Headers()
+		headers.set("Content-Type", "text/html");
+		if (Bun.env.COMPRESSION_ENABLED) {
+			headers.set("Content-Encoding", "gzip");
+		}
+
+		super(maybeCompressedHtml, { headers });
 	}
 }

@@ -1,4 +1,4 @@
-import { Post } from "../post.types.ts";
+import { Post } from "../post.types";
 
 export function postListView(posts: Array<Post>, page: number) {
 	const id = `post-list-${page}`;

@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>{{title}}</title>
-    <meta name="description" content="{{description}}"/>
+    <meta name="description" content="{{description}}" />
 
-    {{global_styles}}
-    {{extra_styles}}
-</head>
-<body>
-{{content}}
-<script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
-{{global_scripts}}
-{{extra_scripts}}
-</body>
+    {{prefetch}}
+    {{global_styles}} {{extra_styles}}
+  </head>
+  <body class="dark">
+    {{content}}
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
+    {{global_scripts}} {{extra_scripts}}
+  </body>
 </html>
