@@ -4,7 +4,7 @@ export class HtmlResponse extends Response {
 			? Bun.gzipSync(Buffer.from(html))
 			: html;
 
-		const headers = new Headers()
+		const headers = new Headers();
 		headers.set("Content-Type", "text/html");
 		if (Bun.env.COMPRESSION_ENABLED) {
 			headers.set("Content-Encoding", "gzip");

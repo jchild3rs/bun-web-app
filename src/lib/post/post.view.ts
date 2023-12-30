@@ -1,7 +1,7 @@
 import { css, cx } from "@styled-system/css";
+import { container, flex } from "@styled-system/patterns";
 import { User } from "../user/user.types";
 import { Post } from "./post.types";
-import { container, flex } from "@styled-system/patterns";
 
 export function postView({
 	post,
@@ -13,13 +13,9 @@ export function postView({
 	const id = post.id;
 
 	return `<div id="post-${id}" class="${cx(
-		container({
-			py: 12,
-			maxW: "prose",
-		}),
 		flex({ direction: "column", gap: "4" }),
 	)}">
-			<a href="/post/${post.id}">
+			<a href="/post/${id}">
 				<h1 class="${css({ fontWeight: "bold", textStyle: "4xl" })}">${
 					post.title
 				}</h1>

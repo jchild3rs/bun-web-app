@@ -1,15 +1,14 @@
 {
   "name": "vanilla-web-app",
   "scripts": {
-    "bundle": "rm -rf dist && bun run conc  --raw \"bun panda\" \"bun run bundle:js\"",
-    "bundle:js": "DEBUG=* bun scripts/bundle.ts",
-    "dev": "rm -rf dist && bun panda && bun run conc --raw --kill-others \"bun panda --watch\" \"bun run dev:js\"",
-    "dev:js": "bun run nodemon --exec='bun run scripts/bundle.ts && DEBUG=* bun --hot ./src/server.ts'",
     "check": "biome check --apply src",
-    "start": "NODE_ENV=production bun run bundle && COMPRESSION_ENABLED=1 NODE_ENV=production bun run dist/server.js"
+    "dev": "DEBUG=app:* bun conc --raw --kill-others \"bun panda --watch\" \"bun nodemon --exec='bun ./scripts/bundle.ts && bun --hot ./src/server.ts'\"",
+    "start": "NODE_ENV=production bun scripts/bundle.ts && COMPRESSION_ENABLED=1 NODE_ENV=production bun run dist/server.js",
+    "test": "bun test"
   },
   "dependencies": {
     "@fontsource/fira-code": "^5.0.16",
+    "@fontsource/inter": "^5.0.16",
     "debug": "^4.3.4",
     "fast-glob": "^3.3.2",
     "path-to-regexp": "^6.2.1"

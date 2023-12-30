@@ -1,10 +1,37 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync } from "fs";
-
 import fg from "fast-glob";
 
-const log = require("debug")("bundle");
+const log = require('debug')('app:bundle')
+
+type ManifestEntry = {
+	path: string;
+	name: string;
+	kind: string;
+	hash: string | null;
+	type: string;
+};
 
 const OUTPUT_PATH = "./dist";
+
+await Bun.spawn(["rm", "-rf", OUTPUT_PATH]).exited;
+log("Removed dist folder");
+
+const fontSourceFonts = [
+	"inter",
+	"fira-code",
+]
+
+await Bun.spawn(["mkdir", "-p", "./dist/static/fonts"]).exited;
+
+const fontFileDirs = fontSourceFonts.map((font) => {
+	return `./node_modules/@fontsource/${font}`
+})
+
+for (const fontFileDir of fontFileDirs) {
+	await Bun.spawn(["cp", "-R", fontFileDir, "./dist/static/fonts"]).exited
+}
+
+await Bun.spawn(["bun", "panda"]).exited;
+log("Built CSS");
 
 const entrypoints = await fg.glob(["**/client.ts", "**/lib/**/*.client.ts"], {
 	dot: true,
@@ -17,16 +44,11 @@ const clientResult = await Bun.build({
 	format: "esm",
 	naming: "js/[name]-[hash].[ext]",
 });
+log("Built JS");
 
 if (clientResult.success) {
 	// generate manifest
-	const manifest: {
-		path: string;
-		name: string;
-		kind: string;
-		hash: string | null;
-		type: string;
-	}[] = [];
+	const manifest: ManifestEntry[] = [];
 
 	for (const output of clientResult.outputs) {
 		manifest.push({
@@ -38,20 +60,18 @@ if (clientResult.success) {
 		});
 	}
 
+	const stylesHash = Bun.hash(
+		await Bun.file("./dist/static/styles/styles.css").arrayBuffer(),
+	);
+	const stylesFile = Bun.file("./dist/static/styles/styles.css");
+	await Bun.write(`./dist/static/styles/styles-${stylesHash}.css`, stylesFile);
 
-	const hash = Bun.hash(await Bun.file("./dist/static/styled-system/styles.css").arrayBuffer())
-	const file = Bun.file("./dist/static/styled-system/styles.css");
-	await Bun.write(`./dist/static/styled-system/styles-${hash}.css`, file);
+	// remove styles.css
+	await Bun.spawn(["rm", "./dist/static/styles/styles.css"]).exited;
 
 	manifest.push({
-		name: `styles-${hash}.css`
-	} as {
-		path: string;
-		name: string;
-		kind: string;
-		hash: string | null;
-		type: string;
-	})
+		name: `styles-${stylesHash}.css`,
+	} as ManifestEntry);
 
 	await Bun.write("./dist/manifest.json", JSON.stringify(manifest, null, 2));
 
@@ -61,25 +81,10 @@ if (clientResult.success) {
 		JSON.stringify(manifest, null, 2),
 	);
 }
+log("Built manifest");
 
-copyDirectory("./public", `${OUTPUT_PATH}/static`);
-
-function copyDirectory(source: string, destination: string) {
-	const files = readdirSync(source);
-	if (!existsSync(destination)) {
-		mkdirSync(destination);
-	}
-
-	for (const file of files) {
-		const sourcePath = `${source}/${file}`;
-		const destinationPath = `${destination}/${file}`;
-		if (!file.includes(".")) {
-			copyDirectory(sourcePath, destinationPath);
-		} else {
-			copyFileSync(sourcePath, destinationPath);
-		}
-	}
-}
+await Bun.spawn(["cp", "-R", "./public/", `${OUTPUT_PATH}/static`]).exited;
+log("Copied public folder");
 
 const serverResult = await Bun.build({
 	entrypoints: ["./src/server.ts"],
@@ -88,5 +93,8 @@ const serverResult = await Bun.build({
 });
 
 if (serverResult.success) {
-	log("server build success");
+	log("Server built");
+} else {
+	console.error("Server build failed");
+	log(serverResult);
 }

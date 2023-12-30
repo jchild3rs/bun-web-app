@@ -1,20 +1,15 @@
-import { Router } from "@lib/common/router/router";
-import { ErrorResponse } from "@lib/common/server/error-response";
-import { NotFoundResponse } from "@lib/common/server/not-found-response";
-
+import { Router } from "@lib/router/router";
+import { ErrorResponse } from "@lib/server/error-response";
+import { NotFoundResponse } from "@lib/server/not-found-response";
 import { routes } from "./routes";
 
-const debug = require("debug")("server");
+const debug = require("debug")("app:server");
+
 const router = new Router(routes);
 
 const server = Bun.serve({
-	port: Bun.env.PORT || 3000,
-	fetch(request) {
-		return router.handle(request) || new NotFoundResponse();
-	},
-	error(error) {
-		return new ErrorResponse(error);
-	},
+	fetch: (request) => router.handle(request) || new NotFoundResponse(),
+	error: (error) => new ErrorResponse(error),
 });
 
 debug("listening on http://localhost:%d", server.port);

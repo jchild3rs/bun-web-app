@@ -3,7 +3,7 @@ export class Meta {
 	description = "";
 	extraScripts = "";
 	extraStyles = "";
-	prefetch: {href: string, as: string}[] = []
+	prefetch: { href: string; as: string }[] = [];
 
 	constructor({
 		title,

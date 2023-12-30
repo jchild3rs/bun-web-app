@@ -3,4 +3,4 @@ export const linkView = (props: {
 	children: string;
 }) => {
 	return `<a href="${props.href}">${props.children}</a>`;
-}
+};

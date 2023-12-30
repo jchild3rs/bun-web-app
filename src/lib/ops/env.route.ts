@@ -1,4 +1,4 @@
-import { Route } from "../common/router/route";
+import { Route } from "@lib/router/route";
 
 export const opsEnvRoute = new Route(
 	"/ops/env",

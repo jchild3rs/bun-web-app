@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@lib/*": ["./src/lib/*"],
-      "@styled-system/*": ["./dist/static/styled-system/*"]
+      "@styled-system/*": ["./dist/static/styles/*"]
     }
-  }
+  },
 }

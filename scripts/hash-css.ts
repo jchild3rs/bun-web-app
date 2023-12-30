@@ -1,8 +1,8 @@
 
-const hash = Bun.hash(await Bun.file("./dist/static/styled-system/styles.css").arrayBuffer())
+const hash = Bun.hash(await Bun.file("./dist/static/styles/styles.css").arrayBuffer())
 
-const file = Bun.file("./dist/static/styled-system/styles.css");
-await Bun.write(`./dist/static/styled-system/styles-${hash}.css`, file);
+const file = Bun.file("./dist/static/styles/styles.css");
+await Bun.write(`./dist/static/styles/styles-${hash}.css`, file);
 
 const manifest: any[] = JSON.parse(await Bun.file("./dist/manifest.json").text())
 

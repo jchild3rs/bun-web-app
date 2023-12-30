@@ -1,16 +1,19 @@
-(function main(doc, win) {
-	function toggleDarkModeClass(isDarkMode: boolean) {
+{
+	const toggleDarkModeClass = (isDarkMode: boolean) => {
 		if (isDarkMode) {
-			doc.body.classList.add("dark");
+			document.body.classList.add("dark");
 		} else {
-			doc.body.classList.remove("dark");
+			document.body.classList.remove("dark");
 		}
-	}
+	};
 
-	const query = win.matchMedia("(prefers-color-scheme: dark)");
-	toggleDarkModeClass(query.matches);
-	query.addEventListener("change", (event) => {
+	const prefersDarkMediaQuery = window.matchMedia(
+		"(prefers-color-scheme: dark)",
+	);
+
+	toggleDarkModeClass(prefersDarkMediaQuery.matches);
+
+	prefersDarkMediaQuery.addEventListener("change", (event) => {
 		toggleDarkModeClass(event.matches);
 	});
-
-})(document, window);
+}

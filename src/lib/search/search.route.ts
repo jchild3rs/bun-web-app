@@ -1,17 +1,20 @@
-import { Route } from "../common/router/route";
-import { HtmlTemplateResponse } from "../common/server/html-template-response";
-import { searchPosts } from "../post/post.service";
+import { getScript } from "@lib/common/asset-loader";
+import { Route } from "@lib/router/route";
+import { HtmlTemplateResponse } from "@lib/server/html-template-response";
+import { postService } from "../post/post.service";
 import { searchFormView } from "./search-form.view";
 
 export const searchRoute = new Route("/search", async ({ request }) => {
 	const url = new URL(request.url);
 	const query = url.searchParams.get("query") || "";
-	const results = await searchPosts(query);
+	const results = await postService.search(query);
 
 	const headline = `Search results for "${query}"`;
 	const html = `
 	<div class="prose">
 	<h3>${headline}</h3>
+	${searchFormView()}
+	${searchFormView()}
 	${searchFormView()}
 <ul>
 ${results
@@ -25,6 +28,7 @@ ${results
 		meta: {
 			title: headline,
 			description: headline,
+			extraScripts: await getScript("search-form.view"),
 		},
 		content: html,
 	});

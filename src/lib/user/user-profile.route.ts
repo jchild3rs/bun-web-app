@@ -1,5 +1,5 @@
-import { Route } from "../common/router/route";
-import { HtmlTemplateResponse } from "../common/server/html-template-response";
+import { Route } from "@lib/router/route";
+import { HtmlTemplateResponse } from "@lib/server/html-template-response";
 
 export const userProfileRoute = new Route(
 	"/user/:id",

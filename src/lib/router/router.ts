@@ -1,11 +1,11 @@
-import debug from "debug";
 import { Route } from "./route";
 import { PathRegexp, RouteHandler } from "./router.types";
+
+const log = require("debug")("app:router");
 
 export class Router {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private readonly routes = new Map<PathRegexp, Route<any>>();
-	private readonly log = debug("router");
 
 	constructor(
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -21,16 +21,14 @@ export class Router {
 		}
 	}
 	private match<Params extends object>(path: string) {
-		this.log("matching route %s", path);
+		log("matching route %s", path);
 
 		for (const [routePath, route] of this.routes.entries()) {
 			const result = route.matcher(path);
+			log("matched? %s", result);
 			// biome-ignore lint/complexity/useOptionalChain: the types on path-to-regexp are wrong
 			if (result && result.params) {
-				return {
-					routePath,
-					params: result.params,
-				};
+				return { routePath, params: result.params };
 			}
 		}
 	}

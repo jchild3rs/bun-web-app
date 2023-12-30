@@ -1,22 +1,22 @@
+import { HttpService } from "@lib/common/http/http.service";
 import { type Post } from "./post.types";
 
-export async function fetchPosts(page = 1) {
-	const r = await fetch(
-		`https://jsonplaceholder.typicode.com/posts?_start=${page}&_limit=5`,
-	);
-	return await r.json();
+class PostService {
+	private httpService = new HttpService("https://jsonplaceholder.typicode.com");
+
+	public async all(page = 1) {
+		return this.httpService.get<Post[]>(`/posts?_start=${page}&_limit=5`);
+	}
+
+	public async byId(id: number) {
+		return this.httpService.get<Post>(`/posts/${id}`);
+	}
+
+	public async search(query: string) {
+		return this.httpService.get<Post[]>(
+			`/posts?title_like=^${encodeURIComponent(query)}`,
+		);
+	}
 }
 
-export async function fetchPostById(id: number): Promise<Post> {
-	const r = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
-	return await r.json();
-}
-
-export async function searchPosts(query: string): Promise<Post[]> {
-	const r = await fetch(
-		`https://jsonplaceholder.typicode.com/posts?title_like=^${encodeURIComponent(
-			query,
-		)}`,
-	);
-	return await r.json();
-}
+export const postService = new PostService();

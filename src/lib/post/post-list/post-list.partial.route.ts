@@ -1,6 +1,6 @@
-import { Route } from "../../common/router/route";
-import { HtmlResponse } from "../../common/server/html-response";
-import { fetchPosts } from "../post.service";
+import { Route } from "@lib/router/route";
+import { HtmlResponse } from "@lib/server/html-response";
+import { postService } from "../post.service";
 import { postListView } from "./post-list.view";
 
 export const postListPartialRoute = new Route<{ page: string }>(
@@ -8,6 +8,6 @@ export const postListPartialRoute = new Route<{ page: string }>(
 	async ({ params }) => {
 		const page = parseInt(params.page);
 
-		return new HtmlResponse(postListView(await fetchPosts(page), page));
+		return new HtmlResponse(postListView(await postService.all(page), page));
 	},
 );
