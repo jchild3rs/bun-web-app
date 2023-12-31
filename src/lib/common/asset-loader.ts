@@ -1,14 +1,6 @@
-import { build } from "bun";
-import buildManifest from "../../../dist/manifest.json";
-
-export async function getStyles(path = "", embedded = true) {
-	// const builtStylesPath = require(
-	// 	join(
-	// 		process.cwd(),
-	// 		`./dist/static/${path ? `${path}/${path}.` : ""}styles.js`,
-	// 	),
-	// ).default;
-	const fileName = buildManifest.find((entry) =>
+export async function getGlobalStyles(embedded = true) {
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const fileName = require("../../../dist/manifest.json").find((entry: any) =>
 		entry.name.includes(".css"),
 	)?.name;
 	const builtStylesPath = `./dist/static/styles/${fileName}`;
@@ -16,7 +8,6 @@ export async function getStyles(path = "", embedded = true) {
 
 	if (embedded) {
 		globalStyles = `<style id="global-styles">${await Bun.file(
-			// join(process.cwd(), "./dist/static", path, builtStylesPath),
 			builtStylesPath,
 		).text()}</style>`;
 	} else {
@@ -30,7 +21,10 @@ export async function getScript(
 	prefix: string,
 	embedded = Bun.env.NODE_ENV === "production",
 ) {
-	const entry = buildManifest.find((entry) => entry.name.includes(prefix));
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const entry = require("../../../dist/manifest.json").find((entry: any) =>
+		entry.name.includes(prefix),
+	);
 
 	if (!entry) {
 		return "";

@@ -1,6 +1,6 @@
 import { layoutView } from "@app/layout.view";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
-import { getScript, getStyles } from "../common/asset-loader";
+import { getScript, getGlobalStyles } from "../common/asset-loader";
 import { Meta, MetaObject } from "../common/meta";
 
 import interManifest from "../../../dist/static/fonts/inter/metadata.json";
@@ -19,7 +19,7 @@ const globalStyles = `
 <style>${(
 	await Bun.file("./dist/static/fonts/fira-code/wght.css").text()
 ).replaceAll("./files", "/fonts/fira-code/files")}</style>
-${await getStyles()}`;
+${await getGlobalStyles()}`;
 
 const globalScripts = `
 <script type="importmap">

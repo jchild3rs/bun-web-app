@@ -12,9 +12,6 @@ type ManifestEntry = {
 
 const OUTPUT_PATH = "./dist";
 
-await Bun.spawn(["rm", "-rf", OUTPUT_PATH]).exited;
-log("Removed dist folder");
-
 const fontSourceFonts = ["inter", "fira-code"];
 
 await Bun.spawn(["mkdir", "-p", "./dist/static/fonts"]).exited;
@@ -99,16 +96,3 @@ log("Built manifest");
 await Bun.spawn(["cp", "-R", "./public/", `${OUTPUT_PATH}/static`]).exited;
 log("Copied public folder");
 
-const serverResult = await Bun.build({
-  entrypoints: ["./src/server.ts"],
-  outdir: OUTPUT_PATH,
-  target: "bun",
-  external: ["sharp"],
-});
-
-if (serverResult.success) {
-  log("Server built");
-} else {
-  console.error("Server build failed");
-  log(serverResult);
-}

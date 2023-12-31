@@ -1,6 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": ".ts,.css,.html",
-  "ignore": [],
-  "exec": "bun ./scripts/bundle.ts && DEBUG=* bun --hot ./src/server.ts"
-}
