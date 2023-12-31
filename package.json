@@ -3,13 +3,13 @@
   "scripts": {
     "check": "biome check --apply src",
     "clean": "rm -rf dist",
-    "dev:js": "bun nodemon -w src --ext .client.ts,.css,.html --exec bun build:js",
+    "dev:js": "bun nodemon -w src --ext .client.ts,.css,.html --exec 'bun build:js'",
     "dev:css": "bun panda --watch",
-    "dev:server": "bun --hot ./src/server.ts",
-    "dev": "bun run build && DEBUG=app:* bun conc --raw --kill-others bun:dev:*",
+    "dev:server": "DEBUG=app:* bun --hot ./src/server.ts",
+    "dev": "bun run build && bun conc --raw --kill-others bun:dev:* | pino-pretty",
     "build": "bun build:js && bun build:server",
-    "build:js": "NODE_ENV=production bun scripts/bundle-client.ts",
-    "build:server": "NODE_ENV=production bun scripts/bundle-server.ts",
+    "build:js": "bun ./scripts/bundle-client.ts",
+    "build:server": "bun ./scripts/bundle-server.ts",
     "start": "bun ./dist/server.js",
     "test": "bun test"
   },
@@ -18,7 +18,9 @@
     "@fontsource-variable/inter": "^5.0.16",
     "debug": "^4.3.4",
     "fast-glob": "^3.3.2",
-    "path-to-regexp": "^6.2.1"
+    "path-to-regexp": "^6.2.1",
+    "pino": "^8.17.2",
+    "prom-client": "^15.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
@@ -26,7 +28,8 @@
     "@types/debug": "^4.1.12",
     "bun-types": "latest",
     "concurrently": "^8.2.2",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "pino-pretty": "^10.3.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

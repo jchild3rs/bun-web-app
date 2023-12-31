@@ -1,9 +1,11 @@
+import { DIST_PATH } from "@lib/server/server.constants";
+
 export async function getGlobalStyles(embedded = true) {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const fileName = require("../../../dist/manifest.json").find((entry: any) =>
+	const fileName = require(`${DIST_PATH}/manifest.json`).find((entry: any) =>
 		entry.name.includes(".css"),
 	)?.name;
-	const builtStylesPath = `./dist/static/styles/${fileName}`;
+	const builtStylesPath = `${DIST_PATH}/static/styles/${fileName}`;
 	let globalStyles;
 
 	if (embedded) {
@@ -22,7 +24,7 @@ export async function getScript(
 	embedded = Bun.env.NODE_ENV === "production",
 ) {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const entry = require("../../../dist/manifest.json").find((entry: any) =>
+	const entry = require(`${DIST_PATH}/manifest.json`).find((entry: any) =>
 		entry.name.includes(prefix),
 	);
 
@@ -31,9 +33,11 @@ export async function getScript(
 	}
 
 	if (entry?.path && embedded) {
-		return `<script type="module">${await Bun.file(
-			entry.path,
-		).text()}</script>`;
+		let path = entry.path;
+		if (Bun.env.NODE_ENV === "production") {
+			path = path.replace("/dist", "");
+		}
+		return `<script type="module">${await Bun.file(path).text()}</script>`;
 	}
 
 	return `<script type="module" src="${entry.name.replace(

@@ -1,11 +1,14 @@
 import { layoutView } from "@app/layout.view";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
-import { getScript, getGlobalStyles } from "../common/asset-loader";
+import { DIST_PATH } from "@lib/server/server.constants";
+import { getGlobalStyles, getScript } from "../common/asset-loader";
 import { Meta, MetaObject } from "../common/meta";
 
-import interManifest from "../../../dist/static/fonts/inter/metadata.json";
-
-const template = await Bun.file("./src/index.html").text();
+const interManifest: {
+	styles: string[];
+	defSubset: string;
+} = JSON.parse(await Bun.file(`${DIST_PATH}/static/fonts/inter/metadata.json`).text());
+const template = await Bun.file("./index.html").text();
 const globalStyles = `
  ${interManifest.styles
 		.map(
@@ -14,18 +17,18 @@ const globalStyles = `
 		)
 		.join("\n")}
 <style>${(
-	await Bun.file("./dist/static/fonts/inter/wght.css").text()
+	await Bun.file(`${DIST_PATH}/static/fonts/inter/wght.css`).text()
 ).replaceAll("./files", "/fonts/inter/files")}</style>
 <style>${(
-	await Bun.file("./dist/static/fonts/fira-code/wght.css").text()
+	await Bun.file(`${DIST_PATH}/static/fonts/fira-code/wght.css`).text()
 ).replaceAll("./files", "/fonts/fira-code/files")}</style>
 ${await getGlobalStyles()}`;
 
 const globalScripts = `
 <script type="importmap">
-  ${JSON.stringify(require("../../../dist/importmap.json"), null, 2)}
+  ${JSON.stringify(require(`${DIST_PATH}/importmap.json`), null, 2)}
 </script>
-    <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
 ${await getScript("client")}
 ${await getScript("search-form.view")}
 `;
@@ -66,9 +69,9 @@ export class HtmlTemplateResponse extends Response {
 		super(maybeCompressedHtml, {
 			...options,
 			headers: {
+				"Cache-Control": cacheControlHeaders.get("cache-control") || "",
 				"Content-Type": "text/html",
 				...(Bun.env.COMPRESSION_ENABLED && { "Content-Encoding": "gzip" }),
-				"cache-control": cacheControlHeaders.get("cache-control") || "",
 			},
 		});
 	}

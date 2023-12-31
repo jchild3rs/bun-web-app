@@ -8,11 +8,13 @@ import { searchRoute } from "@app/search/search.route";
 import { userProfileRoute } from "@app/user/user-profile.route";
 import { Route } from "@lib/router/route";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
+import { DIST_PATH } from "@lib/server/server.constants";
+import {metricsRoute} from "@app/metrics.route";
 
 const staticAssetRoute = new Route<{ file: string[]; extension: string }>(
 	"/:file*.:extension",
 	({ request, params }) => {
-		const filePath = `./dist/static/${params.file.join("/")}.${
+		const filePath = `${DIST_PATH}/static/${params.file.join("/")}.${
 			params.extension
 		}`;
 
@@ -24,6 +26,7 @@ const staticAssetRoute = new Route<{ file: string[]; extension: string }>(
 );
 
 export const routes = [
+	metricsRoute,
 	staticAssetRoute,
 	postListPartialRoute,
 	homePageRoute,

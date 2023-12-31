@@ -4,7 +4,7 @@ const serverResult = await Bun.build({
   entrypoints: ["./src/server.ts"],
   outdir: "./dist",
   target: "bun",
-  external: ["sharp"],
+  external: [],
 });
 
 if (serverResult.success) {
