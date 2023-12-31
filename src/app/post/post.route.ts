@@ -1,16 +1,13 @@
+import { fetchUserById } from "@app/user/user.service";
 import { getScript } from "@lib/common/asset-loader";
-import { extractPrefixFromPath } from "@lib/common/utils/extract-prefix-from-path";
 import { Meta } from "@lib/common/meta";
+import { extractPrefixFromPath } from "@lib/common/utils/extract-prefix-from-path";
 import { Route } from "@lib/router/route";
 import { HtmlTemplateResponse } from "@lib/server/html-template-response";
-import { fetchUserById } from "@lib/user/user.service";
 import { postService } from "./post.service";
 import { postView } from "./post.view";
 
-const extraScripts = await getScript(
-	extractPrefixFromPath(import.meta.url),
-	false,
-);
+const extraScripts = await getScript("post", false);
 
 export const postPageRoute = new Route<{ id: string }>(
 	"/post/:id",

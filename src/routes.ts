@@ -1,10 +1,12 @@
-import { homePageRoute } from "@lib/home/home.route";
-import { opsEnvRoute } from "@lib/ops/env.route";
-import { postListPartialRoute } from "@lib/post/post-list/post-list.partial.route";
-import { postPartialRoute } from "@lib/post/post.partial.route";
-import { postPageRoute } from "@lib/post/post.route";
+import { homePageRoute } from "@app/home/home.route";
+import { opsRoute } from "@app/ops/ops.route";
+import { postListPartialRoute } from "@app/post/post-list/post-list.partial.route";
+import { postPartialRoute } from "@app/post/post.partial.route";
+import { postPageRoute } from "@app/post/post.route";
+import { searchFormResultsRoute } from "@app/search/search-form-results.route";
+import { searchRoute } from "@app/search/search.route";
+import { userProfileRoute } from "@app/user/user-profile.route";
 import { Route } from "@lib/router/route";
-import { searchRoute } from "@lib/search/search.route";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
 
 const staticAssetRoute = new Route<{ file: string[]; extension: string }>(
@@ -28,5 +30,7 @@ export const routes = [
 	searchRoute,
 	postPageRoute,
 	postPartialRoute,
-	opsEnvRoute,
+	userProfileRoute,
+	searchFormResultsRoute,
+	opsRoute,
 ];

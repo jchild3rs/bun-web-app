@@ -15,7 +15,7 @@ export async function getStyles(path = "", embedded = true) {
 	let globalStyles;
 
 	if (embedded) {
-		globalStyles = `<style>${await Bun.file(
+		globalStyles = `<style id="global-styles">${await Bun.file(
 			// join(process.cwd(), "./dist/static", path, builtStylesPath),
 			builtStylesPath,
 		).text()}</style>`;

@@ -23,9 +23,11 @@ export class Router {
 	private match<Params extends object>(path: string) {
 		log("matching route %s", path);
 
+		let lookupCount = 0;
 		for (const [routePath, route] of this.routes.entries()) {
 			const result = route.matcher(path);
-			log("matched? %s", result);
+			log("matched? %o", { result, lookupCount });
+			lookupCount++;
 			// biome-ignore lint/complexity/useOptionalChain: the types on path-to-regexp are wrong
 			if (result && result.params) {
 				return { routePath, params: result.params };

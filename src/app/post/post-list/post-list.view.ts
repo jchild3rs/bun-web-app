@@ -1,4 +1,4 @@
-import { css } from "@styled-system/css/css";
+import { css } from "@styled-system/css";
 import { flex } from "@styled-system/patterns/flex";
 import { SystemStyleObject } from "@styled-system/types/system-types";
 import { Post } from "../post.types";
@@ -16,13 +16,13 @@ export function postListView(posts: Array<Post>, page: number) {
 			<ul>
 				${posts
 					.map(
-						(post) => `<li><a href="/post/${post.id}">${post.title}</a></li>`,
+						(post) =>
+							`<li hx-boost="true"><a href="/post/${post.id}">${post.title}</a></li>`,
 					)
 					.join("\n\t\t\t\t")}
 			</ul>
 			<nav class="${flex({
 				py: 4,
-				px: 12,
 				justify: "space-between",
 			})}">
 				<a${

@@ -1,4 +1,4 @@
-import { notFoundView } from "../404.view";
+import { notFoundView } from "@app/404.view";
 import { HtmlTemplateResponse } from "./html-template-response";
 
 export class NotFoundResponse extends HtmlTemplateResponse {
