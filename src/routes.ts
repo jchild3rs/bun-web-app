@@ -1,4 +1,5 @@
 import { homePageRoute } from "@app/home/home.route";
+import { metricsRoute } from "@app/metrics.route";
 import { opsRoute } from "@app/ops/ops.route";
 import { postListPartialRoute } from "@app/post/post-list/post-list.partial.route";
 import { postPartialRoute } from "@app/post/post.partial.route";
@@ -9,7 +10,6 @@ import { userProfileRoute } from "@app/user/user-profile.route";
 import { Route } from "@lib/router/route";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
 import { DIST_PATH } from "@lib/server/server.constants";
-import {metricsRoute} from "@app/metrics.route";
 
 const staticAssetRoute = new Route<{ file: string[]; extension: string }>(
 	"/:file*.:extension",

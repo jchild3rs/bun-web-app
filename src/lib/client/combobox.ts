@@ -6,7 +6,7 @@ const COMBOBOX_HEIGHT = "40px";
 class Combobox extends HTMLElement {
 	private readonly combobox: HTMLInputElement;
 	private readonly listbox: HTMLUListElement;
-	private originalInput: HTMLInputElement;
+	private originalInput: HTMLInputElement | null;
 	static get observedAttributes() {
 		return ["aria-expanded"];
 	}
@@ -15,9 +15,16 @@ class Combobox extends HTMLElement {
 
 	constructor() {
 		super();
+		this.originalInput = this.firstElementChild as HTMLInputElement | null;
 
-		this.originalInput = this.querySelector("input") as HTMLInputElement;
+		this.fetchSuggestions("").then((html) => {
+			const hidden = !html;
 
+			this.ariaExpanded = `${!hidden}`;
+
+			this.listbox.hidden = hidden;
+			this.listbox.innerHTML = html;
+		});
 		this.className = css({
 			pos: "relative",
 			display: "inline-flex",
@@ -29,7 +36,7 @@ class Combobox extends HTMLElement {
 <input 
 	type="text"
 	id="${this.comboboxId}" 
-	name="${this.originalInput.getAttribute("name") || this.generateId()}"
+	name="${this.originalInput?.getAttribute("name") ?? this.generateId()}"
 	class="${css({
 		outline: "none",
 		height: COMBOBOX_HEIGHT,
@@ -46,13 +53,13 @@ class Combobox extends HTMLElement {
 	aria-autocomplete="list" 
 	autocomplete="off" 
 	role="combobox" 
-	placeholder="${this.originalInput.getAttribute("placeholder") || ""}"
+	placeholder="${this.originalInput?.getAttribute("placeholder") || ""}"
 	aria-haspopup="listbox" 
 	aria-expanded="false" 
 	aria-controls="${this.listboxId}" 
 	aria-owns="${this.listboxId}" 
 	aria-activedescendant="" 
-	required="${this.originalInput.hasAttribute("required")}"
+	required="${this.originalInput?.hasAttribute("required")}"
 />
 <ul 
 	id="${this.listboxId}" 
@@ -97,7 +104,7 @@ class Combobox extends HTMLElement {
 	}
 
 	get id() {
-		return this.originalInput.getAttribute("id") || this.generateId();
+		return this.firstElementChild?.getAttribute("id") || this.generateId();
 	}
 
 	get comboboxId() {
@@ -177,6 +184,14 @@ class Combobox extends HTMLElement {
 		}
 	}
 
+	fetchSuggestions(value: string) {
+		const url = new URL(window.location.href);
+		url.pathname = this.getAttribute("endpoint") as string;
+		url.searchParams.set("query", value);
+
+		return fetch(url).then((res) => res.text());
+	}
+
 	private bindEvents() {
 		document.documentElement.addEventListener("click", (event) => {
 			const target = event.target as HTMLElement;
@@ -218,20 +233,14 @@ class Combobox extends HTMLElement {
 				return;
 			}
 
-			const url = new URL(window.location.href);
-			url.pathname = this.getAttribute("endpoint") as string;
-			url.searchParams.set("query", value);
+			void this.fetchSuggestions(value).then((html) => {
+				const hidden = !html;
 
-			void fetch(url)
-				.then((res) => res.text())
-				.then((html) => {
-					const hidden = !html;
+				this.ariaExpanded = `${!hidden}`;
 
-					this.ariaExpanded = `${!hidden}`;
-
-					this.listbox.hidden = hidden;
-					this.listbox.innerHTML = html;
-				});
+				this.listbox.hidden = hidden;
+				this.listbox.innerHTML = html;
+			});
 		});
 
 		this.combobox.addEventListener("click", () => {
@@ -330,3 +339,5 @@ class Combobox extends HTMLElement {
 
 // "combobox" is not a valid custom element name ?
 customElements.define("enhanced-combobox", Combobox);
+
+export { Combobox };

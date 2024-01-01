@@ -1,8 +1,8 @@
+import { httpLogger, logger } from "@lib/common/logger";
 import { Router } from "@lib/router/router";
 import { ErrorResponse } from "@lib/server/error-response";
 import { NotFoundResponse } from "@lib/server/not-found-response";
 import { routes } from "./routes";
-import { httpLogger, logger } from "@lib/logger";
 // import { collectDefaultMetrics } from "prom-client";
 // import { register } from "@lib/metrics/prometheus";
 //

@@ -7,7 +7,9 @@ import { Meta, MetaObject } from "../common/meta";
 const interManifest: {
 	styles: string[];
 	defSubset: string;
-} = JSON.parse(await Bun.file(`${DIST_PATH}/static/fonts/inter/metadata.json`).text());
+} = JSON.parse(
+	await Bun.file(`${DIST_PATH}/static/fonts/inter/metadata.json`).text(),
+);
 const template = await Bun.file("./index.html").text();
 const globalStyles = `
  ${interManifest.styles
