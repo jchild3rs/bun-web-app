@@ -3,7 +3,7 @@
   "scripts": {
     "check": "biome check --apply src",
     "clean": "rm -rf dist",
-    "dev:js": "bun nodemon --ext .client.ts,.css,.html --exec \"bun build:js\" -w src",
+    "dev:js": "bun nodemon --ext .client.ts,.css,.html --exec \"rm -rf ./dist/static/js && bun build:js\" -w src",
     "dev:server": "DEBUG=app:* bun --hot ./src/server.ts",
     "dev": "bun run build && bun conc --raw --kill-others bun:dev:*",
     "build": "bun build:js && bun build:server",
