@@ -4,7 +4,6 @@
     "check": "biome check --apply src",
     "clean": "rm -rf dist",
     "dev:js": "bun nodemon --ext .client.ts,.css,.html --exec \"bun build:js\" -w src",
-    "dev:css": "bun panda --watch",
     "dev:server": "DEBUG=app:* bun --hot ./src/server.ts",
     "dev": "bun run build && bun conc --raw --kill-others bun:dev:*",
     "build": "bun build:js && bun build:server",
@@ -27,7 +26,6 @@
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
     "@happy-dom/global-registrator": "^12.10.3",
-    "@pandacss/dev": "^0.23.0",
     "@types/debug": "^4.1.12",
     "bun-types": "latest",
     "concurrently": "^8.2.2",
