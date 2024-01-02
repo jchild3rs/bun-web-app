@@ -11,7 +11,7 @@ export function homeView({
 	return `
 	<main>
 		<h1>Posts</h1>
-		${postListView(posts, page)}
+		${postListView({ posts, page })}
 	</main>
 	`;
 }

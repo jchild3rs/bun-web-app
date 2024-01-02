@@ -2,7 +2,9 @@ import { HttpService } from "@lib/common/http/http.service";
 import { type Post } from "./post.types";
 
 class PostService {
-	private httpService = new HttpService("https://jsonplaceholder.typicode.com");
+	private httpService = new HttpService(
+		"https://jsonplaceholder.typicode.com",
+	);
 
 	public async all(page = 1) {
 		return this.httpService.get<Post[]>(`/posts?_start=${page}&_limit=5`);

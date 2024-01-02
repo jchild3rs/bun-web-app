@@ -15,7 +15,9 @@ export const searchView = ({
 	${searchFormView()}
 <ul>
 ${results
-	.map((result) => `<li><a href="/post/${result.id}">${result.title}</a></li>`)
+	.map(
+		(result) => `<li><a href="/post/${result.id}">${result.title}</a></li>`,
+	)
 	.join("")}
 </ul>
 </div>

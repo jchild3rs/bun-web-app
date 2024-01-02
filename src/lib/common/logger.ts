@@ -1,4 +1,6 @@
-export const logger = require("pino")();
+export const logger = require("pino")({
+	level: process.env.LOG_LEVEL || "info",
+});
 
 export const httpLogger = (request: Request, response: Response) => {
 	const requestId =

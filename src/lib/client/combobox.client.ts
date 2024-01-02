@@ -1,114 +1,84 @@
-import { css, cx } from "@styled-system/css";
-import { scrollable } from "@styled-system/patterns";
-
-const COMBOBOX_HEIGHT = "40px";
-
 class Combobox extends HTMLElement {
 	private readonly combobox: HTMLInputElement;
-	private readonly listbox: HTMLUListElement;
-	private originalInput: HTMLInputElement | null;
-	static get observedAttributes() {
-		return ["aria-expanded"];
-	}
 
-	private template = document.createElement("template");
+	private readonly listbox: HTMLUListElement;
+
+	public id: string;
 
 	constructor() {
 		super();
-		this.originalInput = this.firstElementChild as HTMLInputElement | null;
 
-		this.fetchSuggestions("").then((html) => {
-			const hidden = !html;
+		// const root = this.attachShadow({ mode: "open" });
+		// const extraSheet = new CSSStyleSheet();
+		// extraSheet.replaceSync(
+		// document.getElementById("global-styles")?.textContent || "",
+		// );
+		// root.adoptedStyleSheets = [extraSheet];
+		const originalInput = this.firstElementChild;
 
-			this.ariaExpanded = `${!hidden}`;
+		this.id = originalInput?.id ?? `combobox-${this.generateId()}`;
+		this.className = "combobox";
 
-			this.listbox.hidden = hidden;
-			this.listbox.innerHTML = html;
-		});
-		this.className = css({
-			pos: "relative",
-			display: "inline-flex",
-			bg: "neutral.50",
-			color: "neutral.900",
-			height: COMBOBOX_HEIGHT,
-		});
-		this.template.innerHTML = `
-<input 
-	type="text"
-	id="${this.comboboxId}" 
-	name="${this.originalInput?.getAttribute("name") ?? this.generateId()}"
-	class="${css({
-		outline: "none",
-		height: COMBOBOX_HEIGHT,
-		px: 2,
-		bg: "transparent",
-		position: "relative",
-		zIndex: 1,
-		_focus: {
-			ring: "2px solid",
-			ringColor: "blue.500",
-			ringOffset: "1",
-		},
-	})}" 
-	aria-autocomplete="list" 
-	autocomplete="off" 
-	role="combobox" 
-	placeholder="${this.originalInput?.getAttribute("placeholder") || ""}"
-	aria-haspopup="listbox" 
-	aria-expanded="false" 
-	aria-controls="${this.listboxId}" 
-	aria-owns="${this.listboxId}" 
-	aria-activedescendant="" 
-	required="${this.originalInput?.hasAttribute("required")}"
-/>
-<ul 
-	id="${this.listboxId}" 
-	hidden 
-	role="listbox" 
-	aria-label="Suggestions" 
-	class="${cx(
-		css({
-			borderTop: "1px solid",
-			borderColor: "neutral.200",
-			pos: "absolute",
-			zIndex: 2,
-			background: "neutral.50",
-			color: "neutral.900",
-			top: COMBOBOX_HEIGHT,
-			maxH: "200px",
-			left: 0,
-			"& > li": {
-				minH: COMBOBOX_HEIGHT,
-				px: 2,
-				py: 1,
-				fontSize: "sm",
+		// this.className = css({
+		// 	pos: "relative",
+		// 	display: "inline-flex",
+		// 	bg: "neutral.50",
+		// 	color: "neutral.900",
+		// 	height: COMBOBOX_HEIGHT,
+		// });
 
-				"&:hover, &[aria-selected=true]": {
-					background: "blue.500",
-					color: "neutral.100",
-				},
-			},
-		}),
-		scrollable(),
-	)}">
-</ul>`;
-		const template = this.template.content.cloneNode(true);
-
-		// there should be a fallback <input /> as a child for no-JS users. we want to blow that out.
-		this.innerHTML = "";
-
-		this.appendChild(template);
-
-		this.combobox = this.querySelector('[role="combobox"]') as HTMLInputElement;
-		this.listbox = this.querySelector('[role="listbox"]') as HTMLUListElement;
+		this.combobox = this.createCombobox(originalInput);
+		this.listbox = this.createListbox();
 	}
 
-	get id() {
-		return this.firstElementChild?.getAttribute("id") || this.generateId();
+	connectedCallback() {
+		console.log("connectedCallback()");
+
+		if (this.contains(this.combobox)) {
+			return;
+		}
+
+		this.firstElementChild?.remove();
+		this.appendChild(this.combobox);
+		this.appendChild(this.listbox);
+		this.bindEvents();
 	}
 
-	get comboboxId() {
-		return `combobox-${this.id}`;
+	private createCombobox(originalInput: Element | null) {
+		const combobox = document.createElement("input");
+
+		combobox.className = "combobox__input";
+		combobox.type = "text";
+		combobox.id = this.id;
+		combobox.name =
+			originalInput?.getAttribute("name") ?? this.generateId();
+		combobox.ariaAutoComplete = "list";
+		combobox.autocomplete = "off";
+		combobox.role = "combobox";
+		combobox.placeholder = originalInput?.getAttribute("placeholder") || "";
+		combobox.ariaHasPopup = "listbox";
+		combobox.ariaExpanded = "false";
+		combobox.setAttribute("aria-controls", this.listboxId);
+		combobox.setAttribute("aria-owns", this.listboxId);
+		combobox.setAttribute("aria-activedescendant", "");
+
+		if (originalInput?.hasAttribute("required")) {
+			combobox.required = (originalInput as HTMLInputElement).required;
+		}
+
+		return combobox;
+	}
+
+	private createListbox() {
+		const listbox = document.createElement("ul");
+
+		listbox.className = "combobox__results";
+		listbox.id = this.listboxId;
+		listbox.hidden = true;
+		listbox.role = "listbox";
+		// listbox.ariaLabel = "Suggestions";
+
+		return listbox;
 	}
 
 	get listboxId() {
@@ -116,7 +86,7 @@ class Combobox extends HTMLElement {
 	}
 
 	private generateId() {
-		return `combobox-${Math.random().toString(36).slice(2)}`;
+		return Math.random().toString(36).slice(2);
 	}
 
 	private hideListbox() {
@@ -184,12 +154,17 @@ class Combobox extends HTMLElement {
 		}
 	}
 
-	fetchSuggestions(value: string) {
+	get value() {
+		return this.combobox.value;
+	}
+
+	async fetchSuggestions(value: string) {
 		const url = new URL(window.location.href);
 		url.pathname = this.getAttribute("endpoint") as string;
 		url.searchParams.set("query", value);
 
-		return fetch(url).then((res) => res.text());
+		const res = await fetch(url);
+		return await res.text();
 	}
 
 	private bindEvents() {
@@ -261,14 +236,14 @@ class Combobox extends HTMLElement {
 			}
 
 			switch (event.key) {
-				case "Tab": {
+				case "Tab":
 					if (!this.listbox.hidden) {
 						this.hideListbox();
 					}
 					break;
-				}
+
 				case "ArrowUp":
-				case "ArrowDown": {
+				case "ArrowDown":
 					if (!this.listbox.hidden) {
 						event.preventDefault();
 						this.toggleListbox(event.altKey);
@@ -277,20 +252,19 @@ class Combobox extends HTMLElement {
 						);
 					}
 					break;
-				}
-				case "Enter": {
+
+				case "Enter":
 					if (!this.listbox.hidden) {
 						event.preventDefault();
 						this.handleSelection();
 					}
 					break;
-				}
-				case "Escape": {
+
+				case "Escape":
 					if (!this.listbox.hidden) {
 						this.hideListbox();
 					}
 					break;
-				}
 			}
 		});
 	}
@@ -313,27 +287,17 @@ class Combobox extends HTMLElement {
 		}
 
 		if (navigateOnSelect && href) {
-			location.href = href;
+			// location.href = href;
 		}
-	}
 
-	private unbindEvents() {
-		this.listbox.removeEventListener("click", () => {});
-
-		this.combobox.removeEventListener("input", () => {});
-		this.combobox.removeEventListener("click", () => {});
-		this.combobox.removeEventListener("focus", () => {});
-		this.combobox.removeEventListener("keydown", () => {});
-
-		document.documentElement.removeEventListener("click", () => {});
-	}
-
-	connectedCallback() {
-		this.bindEvents();
-	}
-
-	disconnectedCallback() {
-		this.unbindEvents();
+		this.combobox.dispatchEvent(
+			new CustomEvent("combobox:selection", {
+				detail: {
+					value: selectedText,
+					href,
+				},
+			}),
+		);
 	}
 }
 

@@ -13,14 +13,15 @@ const router = new Router(routes);
 
 const server = Bun.serve({
 	async fetch(request) {
-		const response = await (router.handle(request) || new NotFoundResponse());
+		const response = await (router.handle(request) ||
+			new NotFoundResponse());
 
 		httpLogger(request, response);
 
 		return response;
 	},
 	error(error) {
-		logger.error(error);
+		console.error(error);
 
 		return new ErrorResponse(error);
 	},

@@ -1,7 +1,7 @@
 import { layoutView } from "@app/layout.view";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
 import { DIST_PATH } from "@lib/server/server.constants";
-import { getGlobalStyles, getScript } from "../common/asset-loader";
+import { getScript } from "../common/asset-loader";
 import { Meta, MetaObject } from "../common/meta";
 
 const interManifest: {
@@ -20,11 +20,16 @@ const globalStyles = `
 		.join("\n")}
 <style>${(
 	await Bun.file(`${DIST_PATH}/static/fonts/inter/wght.css`).text()
-).replaceAll("./files", "/fonts/inter/files")}</style>
+).replaceAll("./files", "/fonts/inter/files")}
+  
+  body {
+   font-family: 'Inter', sans-serif;
+  }
+</style>
 <style>${(
 	await Bun.file(`${DIST_PATH}/static/fonts/fira-code/wght.css`).text()
 ).replaceAll("./files", "/fonts/fira-code/files")}</style>
-${await getGlobalStyles()}`;
+`;
 
 const globalScripts = `
 <script type="importmap">
@@ -73,7 +78,9 @@ export class HtmlTemplateResponse extends Response {
 			headers: {
 				"Cache-Control": cacheControlHeaders.get("cache-control") || "",
 				"Content-Type": "text/html",
-				...(Bun.env.COMPRESSION_ENABLED && { "Content-Encoding": "gzip" }),
+				...(Bun.env.COMPRESSION_ENABLED && {
+					"Content-Encoding": "gzip",
+				}),
 			},
 		});
 	}

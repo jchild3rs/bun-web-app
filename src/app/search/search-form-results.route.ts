@@ -10,7 +10,9 @@ export const searchFormResultsRoute = new Route(
 		if (!query) return new HtmlResponse("");
 
 		return new HtmlResponse(
-			searchFormResultsView({ posts: await postService.search(query || "") }),
+			searchFormResultsView({
+				posts: await postService.search(query || ""),
+			}),
 		);
 	},
 );

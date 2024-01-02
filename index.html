@@ -5,13 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{title}}</title>
     <meta name="description" content="{{description}}" />
+    <style>
+      .combobox [aria-selected="true"] {
+        color: red;
+      }
+    </style>
+
+    <!-- Start -->
     {{prefetch}}
+    <!-- End -->
+
+    <!-- Start -->
     {{global_styles}}
+    <!-- End -->
+
+    <!-- Start -->
     {{critical_scripts}}
+    <!-- End -->
   </head>
   <body class="dark">
-    {{content}}
-    {{global_scripts}}
-    {{extra_scripts}}
+    {{content}} {{global_scripts}} {{extra_scripts}}
   </body>
 </html>

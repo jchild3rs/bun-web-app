@@ -1,15 +1,16 @@
-/// <reference lib="dom" />
 import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 import { screen } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
-import { Combobox } from "./combobox";
+import { Combobox } from "./combobox.client";
 
 const log = require("debug")("test");
 
-spyOn(Combobox.prototype, "fetchSuggestions").mockImplementation(async () =>
-	`<li role="option" id="option-1">Option 1</li>
+spyOn(Combobox.prototype, "fetchSuggestions").mockImplementation(
+	async () =>
+		`<li role="option" id="option-1">Option 1</li>
 	<li role="option" id="option-2">Option 2</li>
-	<li role="option" id="option-3">Option 3</li>`);
+	<li role="option" id="option-3">Option 3</li>`,
+);
 
 describe("combobox", () => {
 	beforeEach(() => {
@@ -31,11 +32,10 @@ describe("combobox", () => {
 		beforeEach(async () => {
 			const combobox = screen.getByRole<HTMLInputElement>("combobox");
 			await userEvent.click(combobox);
-		})
+		});
 
 		describe("when the textbox is not empty", () => {
 			it("should move visual focus to the first suggested value", async () => {
-
 				await userEvent.keyboard("test{ArrowDown}");
 				const options = await screen.findAllByRole("option");
 				expect(options[0].getAttribute("aria-selected")).toBe("true");
@@ -50,7 +50,7 @@ describe("combobox", () => {
 
 				await userEvent.keyboard("{ArrowDown}");
 				expect(listbox.hidden).toBe(false);
-				log(listbox.outerHTML)
+				log(listbox.outerHTML);
 
 				const options = await screen.findAllByRole("option");
 				expect(options[0].getAttribute("aria-selected")).toBe("true");
@@ -78,6 +78,6 @@ describe("combobox", () => {
 				expect(document.activeElement).toBe(combobox);
 				expect(document.activeElement).not.toBe(listbox);
 			});
-		})
+		});
 	});
 });

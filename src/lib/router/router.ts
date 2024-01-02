@@ -20,7 +20,8 @@ export class Router {
 			}
 		}
 	}
-	private match<Params extends object>(path: string) {
+
+	private match(path: string) {
 		log("matching route %s", path);
 
 		let lookupCount = 0;

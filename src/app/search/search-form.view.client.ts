@@ -1,4 +1,4 @@
-import "@lib/client/combobox";
+import "@lib/client/combobox.client";
 //
 // {
 // 	const searchForms = document.getElementsByClassName(

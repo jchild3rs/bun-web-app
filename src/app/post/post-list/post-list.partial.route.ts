@@ -8,6 +8,8 @@ export const postListPartialRoute = new Route<{ page: string }>(
 	async ({ params }) => {
 		const page = parseInt(params.page);
 
-		return new HtmlResponse(postListView(await postService.all(page), page));
+		return new HtmlResponse(
+			postListView({ posts: await postService.all(page), page }),
+		);
 	},
 );

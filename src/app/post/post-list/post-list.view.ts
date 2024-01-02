@@ -1,18 +1,12 @@
-import { css } from "@styled-system/css";
-import { flex } from "@styled-system/patterns/flex";
-import { SystemStyleObject } from "@styled-system/types/system-types";
 import { Post } from "../post.types";
 
-const linkStyles: SystemStyleObject = {
-	color: "inherit",
-	textDecoration: "none",
-	fontWeight: "bold",
-};
-
-export function postListView(posts: Array<Post>, page: number) {
+export function postListView({
+	posts,
+	page,
+}: { posts: Array<Post>; page: number }) {
 	const id = `post-list-${page}`;
 
-	return `<div id="${id}" class="post-list">
+	return `<div class="post-list" id="${id}"> 
 			<ul>
 				${posts
 					.map(
@@ -21,19 +15,15 @@ export function postListView(posts: Array<Post>, page: number) {
 					)
 					.join("\n\t\t\t\t")}
 			</ul>
-			<nav class="${flex({
-				py: 4,
-				justify: "space-between",
-			})}">
+			<nav>
 				<a${
 					page > 1
 						? `
-					hx-swap="outerHTML" 
+           hx-swap="outerHTML"
+            hx-target="#${id}"
 					hx-get="/partial/post-list/${page - 1}" 
-					hx-target="#${id}"
 					hx-push-url="/?page=${page - 1}" 
 					href="/?page=${page - 1}"
-					class="${css(linkStyles)}"
 				`
 						: ""
 				}>Previous page</a>
@@ -41,12 +31,11 @@ export function postListView(posts: Array<Post>, page: number) {
 				<span>Page ${page}</span>
 				
 				<a 
-					hx-swap="outerHTML" 
+	 hx-swap="outerHTML"
+          hx-target="#${id}"
 					hx-get="/partial/post-list/${page + 1}" 
-					hx-target="#${id}"
 					hx-push-url="/?page=${page + 1}"
 					href="/?page=${page + 1}"
-					class="${css(linkStyles)}"
 				>
 					Next page
 				</a>	

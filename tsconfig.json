@@ -19,11 +19,9 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "combobox": ["./src/lib/client/combobox.ts"],
       "@app/*": ["./src/app/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@styled-system/*": ["./dist/static/styles/*"]
+      "@lib/*": ["./src/lib/*"]
     }
   },
-  "include":  ["src", "dist/static/styles", "scripts"]
+  "include": ["src", "dist/static/styles", "scripts"]
 }
