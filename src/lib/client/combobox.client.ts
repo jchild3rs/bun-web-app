@@ -1,47 +1,49 @@
 class Combobox extends HTMLElement {
-	private readonly combobox: HTMLInputElement;
-
-	private readonly listbox: HTMLUListElement;
-
-	public id: string;
+	private readonly originalInputElement: Element | null;
+	private readonly comboboxElement: HTMLInputElement;
+	private readonly listboxElement: HTMLUListElement;
 
 	constructor() {
 		super();
 
-		// const root = this.attachShadow({ mode: "open" });
-		// const extraSheet = new CSSStyleSheet();
-		// extraSheet.replaceSync(
-		// document.getElementById("global-styles")?.textContent || "",
-		// );
-		// root.adoptedStyleSheets = [extraSheet];
-		const originalInput = this.firstElementChild;
+		this.originalInputElement = this.firstElementChild;
 
-		this.id = originalInput?.id ?? `combobox-${this.generateId()}`;
-		this.className = "combobox";
-
-		// this.className = css({
-		// 	pos: "relative",
-		// 	display: "inline-flex",
-		// 	bg: "neutral.50",
-		// 	color: "neutral.900",
-		// 	height: COMBOBOX_HEIGHT,
-		// });
-
-		this.combobox = this.createCombobox(originalInput);
-		this.listbox = this.createListbox();
+		this.comboboxElement = this.createCombobox(this.firstElementChild);
+		this.listboxElement = this.createListbox();
 	}
 
 	connectedCallback() {
-		console.log("connectedCallback()");
+		this.mount();
+	}
 
-		if (this.contains(this.combobox)) {
+	disconnectedCallback() {
+		this.unmount()
+	}
+
+	private mount() {
+		if (this.contains(this.comboboxElement)) {
 			return;
 		}
 
-		this.firstElementChild?.remove();
-		this.appendChild(this.combobox);
-		this.appendChild(this.listbox);
+		if (this.originalInputElement) {
+			this.originalInputElement.remove();
+		}
+
+		this.appendChild(this.comboboxElement);
+		this.appendChild(this.listboxElement);
+
 		this.bindEvents();
+	}
+
+	private unmount() {
+		this.unbindEvents();
+
+		this.removeChild(this.comboboxElement);
+		this.removeChild(this.listboxElement);
+
+		if (this.originalInputElement) {
+			this.appendChild(this.originalInputElement);
+		}
 	}
 
 	private createCombobox(originalInput: Element | null) {
@@ -91,22 +93,22 @@ class Combobox extends HTMLElement {
 
 	private hideListbox() {
 		this.ariaExpanded = "false";
-		this.listbox.hidden = true;
+		this.listboxElement.hidden = true;
 	}
 
 	private showListbox() {
 		this.ariaExpanded = "true";
-		this.listbox.hidden = false;
+		this.listboxElement.hidden = false;
 	}
 
 	private emptyListbox() {
-		this.listbox.innerHTML = "";
+		this.listboxElement.innerHTML = "";
 	}
 
 	private toggleListbox(isAltPressed: boolean) {
-		if (this.combobox.value && this.listbox.hidden) {
+		if (this.comboboxElement.value && this.listboxElement.hidden) {
 			this.showListbox();
-		} else if (!this.combobox.value && this.listbox.hidden) {
+		} else if (!this.comboboxElement.value && this.listboxElement.hidden) {
 			this.hideListbox();
 		}
 
@@ -116,10 +118,10 @@ class Combobox extends HTMLElement {
 	}
 
 	private toggleListboxSelection(m: (current: number) => number) {
-		const options = this.listbox.querySelectorAll("li");
+		const options = this.listboxElement.querySelectorAll("li");
 		if (options.length > 0) {
 			let current = -1;
-			// biome-ignore lint/complexity/noForEach: <explanation>
+			// biome-ignore lint/complexity/noForEach: NodeListOf doesn't implement Array
 			options.forEach((option, index) => {
 				if (option.getAttribute("aria-selected") === "true") {
 					current = index;
@@ -134,31 +136,31 @@ class Combobox extends HTMLElement {
 			}
 
 			if (options.item(nextIndex)) {
-				this.combobox.setAttribute(
+				this.comboboxElement.setAttribute(
 					"aria-activedescendant",
 					options[nextIndex].id,
 				);
 				const selectedOption = options[nextIndex];
 				selectedOption.setAttribute("aria-selected", "true");
 
-				const listboxRect = this.listbox.getBoundingClientRect();
+				const listboxRect = this.listboxElement.getBoundingClientRect();
 				const optionRect = selectedOption.getBoundingClientRect();
 				if (optionRect.bottom > listboxRect.bottom) {
-					this.listbox.scrollTop =
-						selectedOption.offsetTop - this.listbox.offsetTop;
+					this.listboxElement.scrollTop =
+						selectedOption.offsetTop - this.listboxElement.offsetTop;
 				} else if (optionRect.top < listboxRect.top) {
-					this.listbox.scrollTop =
-						selectedOption.offsetTop - this.listbox.offsetTop;
+					this.listboxElement.scrollTop =
+						selectedOption.offsetTop - this.listboxElement.offsetTop;
 				}
 			}
 		}
 	}
 
-	get value() {
-		return this.combobox.value;
+	public get value() {
+		return this.comboboxElement.value;
 	}
 
-	async fetchSuggestions(value: string) {
+	private async fetchSuggestions(value: string) {
 		const url = new URL(window.location.href);
 		url.pathname = this.getAttribute("endpoint") as string;
 		url.searchParams.set("query", value);
@@ -167,111 +169,113 @@ class Combobox extends HTMLElement {
 		return await res.text();
 	}
 
-	private bindEvents() {
+	private handleClickOutside = () => {
 		document.documentElement.addEventListener("click", (event) => {
 			const target = event.target as HTMLElement;
-			if (target !== this.combobox && target !== this.listbox) {
+			if (target !== this.comboboxElement && target !== this.listboxElement) {
 				this.hideListbox();
 			}
 		});
+	};
+	private handleListboxClick = (event: MouseEvent) => {
+		const target = event.target as HTMLElement;
+		if (target.getAttribute("role") === "option") {
+			this.comboboxElement.value = target.innerText;
+			this.comboboxElement.focus();
 
-		this.listbox.addEventListener("click", (event) => {
-			const target = event.target as HTMLElement;
-			if (target.getAttribute("role") === "option") {
-				this.combobox.value = target.innerText;
-				this.combobox.focus();
+			for (const option of this.listboxElement.querySelectorAll(
+				"li",
+			) as unknown as HTMLLIElement[]) {
+				option.setAttribute("aria-selected", "false");
+			}
 
-				for (const option of this.listbox.querySelectorAll(
-					"li",
-				) as unknown as HTMLLIElement[]) {
-					option.setAttribute("aria-selected", "false");
+			target.setAttribute("aria-selected", "true");
+			this.comboboxElement.setAttribute(
+				"aria-activedescendant",
+				target.id,
+			);
+
+			this.handleSelection();
+			this.hideListbox();
+		}
+	};
+
+	private handleComboboxInput = async (event: Event) => {
+		if (!this.listboxElement) {
+			return;
+		}
+
+		const value = (event.target as HTMLInputElement).value;
+
+		if (value.length === 0) {
+			this.emptyListbox();
+			this.hideListbox();
+			return;
+		}
+
+		void this.fetchSuggestions(value).then((html) => {
+			const hidden = !html;
+
+			this.ariaExpanded = `${!hidden}`;
+
+			this.listboxElement.hidden = hidden;
+			this.listboxElement.innerHTML = html;
+		});
+	};
+
+	private handleComboboxClick = (_: MouseEvent) => {
+		if (this.listboxElement.childNodes.length > 0) {
+			this.showListbox();
+		}
+	};
+
+	private handleComboboxFocus = () => {
+		if (this.listboxElement.childNodes.length > 0) {
+			this.showListbox();
+		}
+	};
+
+	private handleComboboxKeydown = (event: KeyboardEvent) => {
+		if (!this.listboxElement) {
+			return;
+		}
+
+		switch (event.key) {
+			case "Tab":
+				if (!this.listboxElement.hidden) {
+					this.hideListbox();
 				}
+				break;
 
-				target.setAttribute("aria-selected", "true");
-				this.combobox.setAttribute("aria-activedescendant", target.id);
+			case "ArrowUp":
+			case "ArrowDown":
+				if (!this.listboxElement.hidden) {
+					event.preventDefault();
+					this.toggleListbox(event.altKey);
+					this.toggleListboxSelection((prev) =>
+						event.key === "ArrowUp" ? prev - 1 : prev + 1,
+					);
+				}
+				break;
 
-				this.handleSelection();
-				this.hideListbox();
-			}
-		});
+			case "Enter":
+				if (!this.listboxElement.hidden) {
+					event.preventDefault();
+					this.handleSelection();
+				}
+				break;
 
-		this.combobox.addEventListener("input", (event) => {
-			if (!this.listbox) {
-				return;
-			}
-
-			const value = (event.target as HTMLInputElement).value;
-
-			if (value.length === 0) {
-				this.emptyListbox();
-				this.hideListbox();
-				return;
-			}
-
-			void this.fetchSuggestions(value).then((html) => {
-				const hidden = !html;
-
-				this.ariaExpanded = `${!hidden}`;
-
-				this.listbox.hidden = hidden;
-				this.listbox.innerHTML = html;
-			});
-		});
-
-		this.combobox.addEventListener("click", () => {
-			if (this.listbox.childNodes.length > 0) {
-				this.showListbox();
-			}
-		});
-
-		this.combobox.addEventListener("focus", () => {
-			if (this.listbox.childNodes.length > 0) {
-				this.showListbox();
-			}
-		});
-
-		this.combobox.addEventListener("keydown", (event) => {
-			if (!this.listbox) {
-				return;
-			}
-
-			switch (event.key) {
-				case "Tab":
-					if (!this.listbox.hidden) {
-						this.hideListbox();
-					}
-					break;
-
-				case "ArrowUp":
-				case "ArrowDown":
-					if (!this.listbox.hidden) {
-						event.preventDefault();
-						this.toggleListbox(event.altKey);
-						this.toggleListboxSelection((prev) =>
-							event.key === "ArrowUp" ? prev - 1 : prev + 1,
-						);
-					}
-					break;
-
-				case "Enter":
-					if (!this.listbox.hidden) {
-						event.preventDefault();
-						this.handleSelection();
-					}
-					break;
-
-				case "Escape":
-					if (!this.listbox.hidden) {
-						this.hideListbox();
-					}
-					break;
-			}
-		});
-	}
+			case "Escape":
+				if (!this.listboxElement.hidden) {
+					this.hideListbox();
+				}
+				break;
+		}
+	};
 
 	private handleSelection() {
 		const navigateOnSelect = this.hasAttribute("navigate-on-select");
-		const selectedItem = this.listbox.querySelector(
+		const selectedItem = this.listboxElement.querySelector(
 			"[aria-selected=true]",
 		) as HTMLLIElement;
 		if (!selectedItem) {
@@ -283,20 +287,68 @@ class Combobox extends HTMLElement {
 
 		if (selectedText) {
 			this.hideListbox();
-			this.combobox.value = selectedText;
+			this.comboboxElement.value = selectedText;
 		}
 
 		if (navigateOnSelect && href) {
 			// location.href = href;
 		}
 
-		this.combobox.dispatchEvent(
+		this.comboboxElement.dispatchEvent(
 			new CustomEvent("combobox:selection", {
 				detail: {
 					value: selectedText,
 					href,
 				},
 			}),
+		);
+	}
+
+	private bindEvents() {
+		document.documentElement.addEventListener(
+			"click",
+			this.handleClickOutside,
+		);
+		this.listboxElement.addEventListener("click", this.handleListboxClick);
+		this.comboboxElement.addEventListener(
+			"input",
+			this.handleComboboxInput,
+		);
+		this.comboboxElement.addEventListener(
+			"click",
+			this.handleComboboxClick,
+		);
+		this.comboboxElement.addEventListener(
+			"focus",
+			this.handleComboboxFocus,
+		);
+		this.comboboxElement.addEventListener(
+			"keydown",
+			this.handleComboboxKeydown,
+		);
+	}
+
+	private unbindEvents() {
+		document.documentElement.removeEventListener(
+			"click",
+			this.handleClickOutside,
+		);
+		this.listboxElement.removeEventListener("click", this.handleListboxClick);
+		this.comboboxElement.removeEventListener(
+			"input",
+			this.handleComboboxInput,
+		);
+		this.comboboxElement.removeEventListener(
+			"click",
+			this.handleComboboxClick,
+		);
+		this.comboboxElement.removeEventListener(
+			"focus",
+			this.handleComboboxFocus,
+		);
+		this.comboboxElement.removeEventListener(
+			"keydown",
+			this.handleComboboxKeydown,
 		);
 	}
 }
