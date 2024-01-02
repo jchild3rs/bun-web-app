@@ -2,6 +2,8 @@ import fg from "fast-glob";
 
 const log = require("debug")("app:bundle");
 
+const isDev = process.env.NODE_ENV !== "production";
+
 type ManifestEntry = {
 	path: string;
 	name: string;
@@ -46,8 +48,10 @@ async function buildJS() {
 		target: "browser",
 		format: "esm",
 		splitting: true,
-		minify: true,
+		minify: !isDev,
+		sourcemap: isDev ? "inline" : "none",
 		naming: "js/[name]-[hash].[ext]",
+		publicPath: "/js/"
 	});
 
 	if (!clientResult.success) {
@@ -74,16 +78,7 @@ const [, stylesHash, clientResult] = await Promise.all([
 
 if (clientResult) {
 	const manifest: ManifestEntry[] = [];
-	const importMap: {
-		imports: Record<string, string>;
-	} = {
-		imports: {},
-	};
 	for (const output of clientResult.outputs) {
-		const actualPath = output.path.split("/dist/static")[1];
-		const outputPath = actualPath.replace("/js/", "");
-		importMap.imports[outputPath] = actualPath;
-
 		manifest.push({
 			path: output.path,
 			name: output.path.split("/dist")[1],
@@ -91,15 +86,6 @@ if (clientResult) {
 			hash: output.hash,
 			type: output.type,
 		});
-	}
-
-	try {
-		await Bun.write(
-			"./dist/importmap.json",
-			JSON.stringify(importMap, null, 2),
-		);
-	} catch (error) {
-		bail(error);
 	}
 
 	manifest.push({

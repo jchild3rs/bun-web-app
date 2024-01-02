@@ -32,9 +32,6 @@ const globalStyles = `
 `;
 
 const globalScripts = `
-<script type="importmap">
-  ${JSON.stringify(require(`${DIST_PATH}/importmap.json`), null, 2)}
-</script>
 <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
 ${await getScript("client")}
 ${await getScript("search-form.view")}
