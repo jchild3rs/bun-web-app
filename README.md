@@ -1,4 +1,4 @@
-# vanilla-web-app
+# bun-web-app
 
 To install dependencies:
 
@@ -6,10 +6,24 @@ To install dependencies:
 bun install
 ```
 
-To run:
+To run the server in dev mode:
 
 ```bash
-bun run index.ts
+bun dev
 ```
 
-This project was created using `bun init` in bun v1.0.18. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+To run the server in production mode:
+
+```bash
+bun run build && bun run ./dist/server.js
+```
+
+To build with Docker:
+``` bash
+docker build --pull -t bun-web-app .
+```
+
+To run with Docker:
+``` bash
+docker run -d -p 3000:3000 bun-web-app
+```

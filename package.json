@@ -1,5 +1,5 @@
 {
-  "name": "vanilla-web-app",
+  "name": "bun-web-app",
   "scripts": {
     "check": "biome check --apply src",
     "clean": "rm -rf dist",
