@@ -6,8 +6,10 @@ class PostService {
 		"https://jsonplaceholder.typicode.com",
 	);
 
-	public async all(page = 1) {
-		return this.httpService.get<Post[]>(`/posts?_start=${page}&_limit=5`);
+	public async all(page = 1, limit = 6) {
+		return this.httpService.get<Post[]>(
+			`/posts?_start=${page + limit}&_limit=${limit}`,
+		);
 	}
 
 	public async byId(id: number) {

@@ -1,7 +1,6 @@
 import { fetchUserById } from "@app/user/user.service";
 import { getScript } from "@lib/common/asset-loader";
 import { Meta } from "@lib/common/meta";
-import { extractPrefixFromPath } from "@lib/common/utils/extract-prefix-from-path";
 import { Route } from "@lib/router/route";
 import { HtmlTemplateResponse } from "@lib/server/html-template-response";
 import { postService } from "./post.service";
@@ -26,7 +25,7 @@ export const postPageRoute = new Route<{ id: string }>(
 		return new HtmlTemplateResponse({
 			meta,
 
-			content: postView({ post, user }),
+			content: `<div class="content">${postView({ post, user })}</div>`,
 		});
 	},
 );

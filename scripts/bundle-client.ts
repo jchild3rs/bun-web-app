@@ -1,5 +1,6 @@
+import path from "path";
 import fg from "fast-glob";
-
+import postcss from "postcss";
 const log = require("debug")("app:bundle");
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -30,7 +31,24 @@ async function copyFonts() {
 	log("Copied fonts");
 }
 
+const postcssJitProps = require("postcss-jit-props");
+const OpenProps = require("open-props");
+const atImport = require("postcss-import")
+const postcssCustomMedia = require('postcss-custom-media');
+
 async function buildCSS() {
+
+	const stylesheet = await Bun.file("./src/styles.css").text();
+	const plugins: postcss.AcceptedPlugin[] = [
+		atImport(),
+		postcssCustomMedia(),
+		postcssJitProps(OpenProps),
+	];
+	const result = await postcss(plugins).process(stylesheet, {
+		from: "./src/styles.css",
+	});
+
+	await Bun.write(`${OUTPUT_PATH}/static/styles.css`, result.css);
 	// todo
 }
 
@@ -51,7 +69,7 @@ async function buildJS() {
 		minify: !isDev,
 		sourcemap: isDev ? "inline" : "none",
 		naming: "js/[name]-[hash].[ext]",
-		publicPath: "/js/"
+		publicPath: "/js/",
 	});
 
 	if (!clientResult.success) {

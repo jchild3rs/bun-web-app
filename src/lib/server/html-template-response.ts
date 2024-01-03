@@ -4,32 +4,55 @@ import { DIST_PATH } from "@lib/server/server.constants";
 import { getScript } from "../common/asset-loader";
 import { Meta, MetaObject } from "../common/meta";
 
-const interManifest: {
+type FontManifest = {
 	styles: string[];
 	defSubset: string;
-} = JSON.parse(
-	await Bun.file(`${DIST_PATH}/static/fonts/inter/metadata.json`).text(),
-);
+};
+
+async function loadFont(fontName: string): Promise<{
+	manifest: FontManifest;
+	styles: string;
+	preload: string;
+}> {
+	const manifest: FontManifest = JSON.parse(
+		await Bun.file(
+			`${DIST_PATH}/static/fonts/${fontName}/metadata.json`,
+		).text(),
+	);
+
+	const styles = await Bun.file(
+		`${DIST_PATH}/static/fonts/${fontName}/wght.css`,
+	).text();
+
+	return {
+		manifest,
+		styles: styles.replaceAll("./files", `/fonts/${fontName}/files`),
+		preload: manifest.styles
+			.map(
+				(style) =>
+					`<link rel="preload" href="/fonts/${fontName}/files/${fontName}-${manifest.defSubset}-wght-${style}.woff2" as="font" type="font/woff2" crossorigin />`,
+			)
+			.join("\n"),
+	};
+}
+
+function loadStylesheet(path: string) {
+	return Bun.file(path).text();
+}
+
+const inter = await loadFont("inter");
+const firaCode = await loadFont("fira-code");
+
 const template = await Bun.file("./index.html").text();
-const globalStyles = `
- ${interManifest.styles
-		.map(
-			(style) =>
-				`<link rel="preload" href="/fonts/inter/files/inter-${interManifest.defSubset}-wght-${style}.woff2" as="font" type="font/woff2" crossorigin>`,
-		)
-		.join("\n")}
-<style>${(
-	await Bun.file(`${DIST_PATH}/static/fonts/inter/wght.css`).text()
-).replaceAll("./files", "/fonts/inter/files")}
-  
-  body {
-   font-family: 'Inter', sans-serif;
-  }
-</style>
-<style>${(
-	await Bun.file(`${DIST_PATH}/static/fonts/fira-code/wght.css`).text()
-).replaceAll("./files", "/fonts/fira-code/files")}</style>
-`;
+
+const globalStyles = `${inter.preload}
+ 
+<style>	
+${inter.styles}
+${firaCode.styles}
+
+${await loadStylesheet("./dist/static/styles.css")}
+</style>`;
 
 const globalScripts = `
 <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>

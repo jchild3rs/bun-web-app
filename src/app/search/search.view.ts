@@ -8,7 +8,7 @@ export const searchView = ({
 	headline: string;
 	results: Post[];
 }) => `
-	<div class="prose">
+	<div class="prose content">
 	<h3>${headline}</h3>
 	${searchFormView()}
 	${searchFormView()}

@@ -9,7 +9,7 @@ type PostViewData = {
 export function postView({ post, user }: PostViewData) {
 	const id = post.id;
 
-	return `<div id="post-${id}" class="post-view">
+	return `<div id="post-${id}" class="post-view content">
 			<a href="/post/${id}">
 				<h1>${post.title}</h1>
 			</a>

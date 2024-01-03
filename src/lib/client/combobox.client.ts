@@ -17,7 +17,7 @@ class Combobox extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this.unmount()
+		this.unmount();
 	}
 
 	private mount() {
@@ -147,10 +147,12 @@ class Combobox extends HTMLElement {
 				const optionRect = selectedOption.getBoundingClientRect();
 				if (optionRect.bottom > listboxRect.bottom) {
 					this.listboxElement.scrollTop =
-						selectedOption.offsetTop - this.listboxElement.offsetTop;
+						selectedOption.offsetTop -
+						this.listboxElement.offsetTop;
 				} else if (optionRect.top < listboxRect.top) {
 					this.listboxElement.scrollTop =
-						selectedOption.offsetTop - this.listboxElement.offsetTop;
+						selectedOption.offsetTop -
+						this.listboxElement.offsetTop;
 				}
 			}
 		}
@@ -172,7 +174,10 @@ class Combobox extends HTMLElement {
 	private handleClickOutside = () => {
 		document.documentElement.addEventListener("click", (event) => {
 			const target = event.target as HTMLElement;
-			if (target !== this.comboboxElement && target !== this.listboxElement) {
+			if (
+				target !== this.comboboxElement &&
+				target !== this.listboxElement
+			) {
 				this.hideListbox();
 			}
 		});
@@ -333,7 +338,10 @@ class Combobox extends HTMLElement {
 			"click",
 			this.handleClickOutside,
 		);
-		this.listboxElement.removeEventListener("click", this.handleListboxClick);
+		this.listboxElement.removeEventListener(
+			"click",
+			this.handleListboxClick,
+		);
 		this.comboboxElement.removeEventListener(
 			"input",
 			this.handleComboboxInput,

@@ -3,12 +3,12 @@
   "scripts": {
     "check": "biome check --apply src",
     "clean": "rm -rf dist",
-    "dev:js": "bun nodemon --ext .client.ts,.css,.html --exec \"rm -rf ./dist/static/js && bun build:js\" -w src",
+    "dev:client": "bun nodemon --ext .client.ts,.css,.html --exec \"rm -rf ./dist/static/js && bun bundle:client\" -w src",
     "dev:server": "DEBUG=app:* bun --hot ./src/server.ts",
-    "dev": "bun run build && bun conc --raw --kill-others bun:dev:*",
-    "build": "bun build:js && bun build:server",
-    "build:js": "bun ./scripts/bundle-client.ts",
-    "build:server": "bun ./scripts/bundle-server.ts",
+    "dev": "bun run bundle && bun conc --raw --kill-others bun:dev:*",
+    "bundle": "bun bundle:client && bun bundle:server",
+    "bundle:client": "bun ./scripts/bundle-client.ts",
+    "bundle:server": "bun ./scripts/bundle-server.ts",
     "start": "bun ./dist/server.js",
     "test": "bun test"
   },
@@ -21,16 +21,22 @@
     "fast-glob": "^3.3.2",
     "path-to-regexp": "^6.2.1",
     "pino": "^8.17.2",
+    "postcss-custom-media": "^10.0.2",
     "prom-client": "^15.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
+    "@fontsource/playfair-display": "^5.0.18",
     "@happy-dom/global-registrator": "^12.10.3",
     "@types/debug": "^4.1.12",
     "bun-types": "latest",
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.2",
-    "pino-pretty": "^10.3.1"
+    "open-props": "^1.6.16",
+    "pino-pretty": "^10.3.1",
+    "postcss": "^8.4.32",
+    "postcss-import": "^15.1.0",
+    "postcss-jit-props": "^1.0.14"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

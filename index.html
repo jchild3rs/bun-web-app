@@ -1,29 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{{title}}</title>
-    <meta name="description" content="{{description}}" />
-    <style>
-      .combobox [aria-selected="true"] {
-        color: red;
-      }
-    </style>
-
-    <!-- Start -->
+    <meta name="description" content="{{description}}"/>
     {{prefetch}}
-    <!-- End -->
-
-    <!-- Start -->
     {{global_styles}}
-    <!-- End -->
-
-    <!-- Start -->
     {{critical_scripts}}
-    <!-- End -->
-  </head>
-  <body class="dark">
-    {{content}} {{global_scripts}} {{extra_scripts}}
-  </body>
+</head>
+<body>
+{{content}}
+{{global_scripts}}
+{{extra_scripts}}
+</body>
 </html>

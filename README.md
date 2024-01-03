@@ -15,7 +15,7 @@ bun dev
 To run the server in production mode:
 
 ```bash
-bun run build && bun run ./dist/server.js
+bun bundle && bun run ./dist/server.js
 ```
 
 To build with Docker:

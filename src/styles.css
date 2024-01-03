@@ -1,0 +1,67 @@
+@import "open-props/open-props.min.css";
+@import "open-props/normalize.min.css";
+@import "open-props/buttons.min.css";
+@import "./theme.css";
+
+html {
+    block-size: 100%;
+    background-color: var(--surface-1);
+    color: var(--text-1);
+    accent-color: var(--brand);
+}
+
+body {
+    min-block-size: 100%;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+}
+
+code {
+    font-family: 'Fira Code Variable', 'JetBrains Mono', monospace;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--size-6);
+    padding-block: var(--size-6);
+    padding-inline: var(--size-6);
+    background-color: var(--surface-1);
+    box-shadow: var(--shadow-2);
+    position: sticky;
+    top: 0;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--size-6);
+    max-inline-size: 100%;
+    margin: 0 auto;
+    padding: var(--size-6);
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-6);
+    padding-block: var(--size-6);
+    padding-inline: var(--size-6);
+    background-color: var(--surface-1);
+    font-size: var(--font-size-0);
+}
+
+.post-list ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--size-6);
+    max-inline-size: 100%;
+    margin: 0 auto var(--size-6);
+    list-style: none;
+}
+
+.post-list ul,
+.post-list li {
+    padding: 0;
+}
