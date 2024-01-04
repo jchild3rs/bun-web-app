@@ -22,7 +22,6 @@ html {
     --shadow-strength-dark: 80%;
 }
 
-
 :root {
     color-scheme: light;
 
@@ -38,7 +37,8 @@ html {
     --shadow-strength: var(--shadow-strength-light);
 }
 
-@media (prefers-color-scheme: dark) {
+
+@media (--OSdark) {
     :root {
         color-scheme: dark;
 
@@ -52,4 +52,11 @@ html {
         --surface-shadow: var(--surface-shadow-dark);
         --shadow-strength: var(--shadow-strength-dark);
     }
+}
+
+html {
+    --font-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Fira Code Variable', 'JetBrains Mono', monospace;
+    --font-serif: 'Playfair Display Variable', ui-serif, serif;
+    --outline-color: var(--brand,var(--link));
 }

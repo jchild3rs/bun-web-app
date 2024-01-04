@@ -1,22 +1,14 @@
 import { DIST_PATH } from "@lib/server/server.constants";
 
-export async function getGlobalStyles(embedded = true) {
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const fileName = require(`${DIST_PATH}/manifest.json`).find((entry: any) =>
-		entry.name.includes(".css"),
-	)?.name;
-	const builtStylesPath = `${DIST_PATH}/static/styles/${fileName}`;
-	let globalStyles;
+const manifest = require(`${DIST_PATH}/manifest.json`);
+export async function getStyles(name: string): Promise<string> {
+	const cssEntry = manifest.find(
+		// biome-ignore lint/suspicious/noExplicitAny: <todo explanation>
+		(entry: any) =>
+			entry.kind === "stylesheet" && entry.name.includes(name),
+	);
 
-	if (embedded) {
-		globalStyles = `<style id="global-styles">${await Bun.file(
-			builtStylesPath,
-		).text()}</style>`;
-	} else {
-		globalStyles = `<link rel="stylesheet" href="/styles/${fileName}">`;
-	}
-
-	return globalStyles;
+	return cssEntry ? Bun.file(cssEntry.path).text() : "";
 }
 
 export async function getScript(
@@ -24,9 +16,7 @@ export async function getScript(
 	embedded = Bun.env.NODE_ENV === "production",
 ) {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const entry = require(`${DIST_PATH}/manifest.json`).find((entry: any) =>
-		entry.name.includes(prefix),
-	);
+	const entry = manifest.find((entry: any) => entry.name.includes(prefix));
 
 	if (!entry) {
 		return "";
@@ -40,8 +30,5 @@ export async function getScript(
 		return `<script type="module">${await Bun.file(path).text()}</script>`;
 	}
 
-	return `<script type="module" src="${entry.name.replace(
-		"/static",
-		"",
-	)}"></script>`;
+	return `<script type="module" src="${entry.publicPath}"></script>`;
 }

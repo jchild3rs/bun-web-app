@@ -10,7 +10,7 @@ export function homeView({
 }) {
 	return `
 	<main class="content">
-		<h1>Posts</h1>
+		<h1 class="font-serif">Posts</h1>
 		${postListView({ posts, page })}
 	</main>
 	`;

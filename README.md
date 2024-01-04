@@ -9,7 +9,7 @@ bun install
 To run the server in dev mode:
 
 ```bash
-bun dev
+DEBUG=app:* bun dev
 ```
 
 To run the server in production mode:

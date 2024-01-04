@@ -1,28 +1,33 @@
 import { User } from "../user/user.types";
-import { Post } from "./post.types";
+import { Photo, Post } from "./post.types";
 
 type PostViewData = {
+	photo: Photo;
 	post: Post;
 	user: User;
 };
 
-export function postView({ post, user }: PostViewData) {
+export function postView({ photo, post, user }: PostViewData) {
 	const id = post.id;
 
 	return `<div id="post-${id}" class="post-view content">
-			<a href="/post/${id}">
-				<h1>${post.title}</h1>
-			</a>
+			<h1 class="font-serif">
+				<a href="/post/${id}">
+					${post.title}
+				</a>
+			</h1>
 
-			<img alt="Image" src="https://picsum.photos/600" fetchpriority="high" loading="eager" width="600" height="600" />
-			
 			<p class="post-author">Written by <a href="/user/${post.userId}">${
 				user.name
 			}</a></p>
 			
 			<p>${post.body}</p>
-			
-			<blockquote>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex expedita ipsam magni nam vero. Consequuntur dolor earum eveniet ex hic, impedit inventore iure recusandae sapiente tempore ullam vel, voluptatem voluptatibus.</blockquote>
+
+			<img alt="Image" src="${photo.url}" fetchpriority="high" loading="eager" width="600" height="600" />
+						
+			<blockquote>
+			<p>Lorem sit amet, consectetur adipisicing elit. Ex expedita ipsam magni nam vero. Consequuntur dolor earum eveniet ex hic, impedit inventore iure recusandae sapiente tempore ullam vel, voluptatem voluptatibus.</p>
+</blockquote>
 		
 			<nav>
 				<a${

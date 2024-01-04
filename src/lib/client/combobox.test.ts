@@ -5,13 +5,6 @@ import { Combobox } from "./combobox.client";
 
 const log = require("debug")("test");
 
-spyOn(Combobox.prototype, "fetchSuggestions").mockImplementation(
-	async () =>
-		`<li role="option" id="option-1">Option 1</li>
-	<li role="option" id="option-2">Option 2</li>
-	<li role="option" id="option-3">Option 3</li>`,
-);
-
 describe("combobox", () => {
 	beforeEach(() => {
 		document.body.innerHTML = `

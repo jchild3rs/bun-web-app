@@ -1,7 +1,7 @@
 import { layoutView } from "@app/layout.view";
 import { createCacheControlHeaders } from "@lib/server/cache-control";
 import { DIST_PATH } from "@lib/server/server.constants";
-import { getScript } from "../common/asset-loader";
+import {getScript, getStyles} from "../common/asset-loader";
 import { Meta, MetaObject } from "../common/meta";
 
 type FontManifest = {
@@ -42,16 +42,18 @@ function loadStylesheet(path: string) {
 
 const inter = await loadFont("inter");
 const firaCode = await loadFont("fira-code");
+const playfairDisplay = await loadFont("playfair-display");
 
 const template = await Bun.file("./index.html").text();
 
 const globalStyles = `${inter.preload}
- 
+ ${playfairDisplay.preload}
 <style>	
 ${inter.styles}
 ${firaCode.styles}
+${playfairDisplay.styles}
 
-${await loadStylesheet("./dist/static/styles.css")}
+${await getStyles("styles")}
 </style>`;
 
 const globalScripts = `

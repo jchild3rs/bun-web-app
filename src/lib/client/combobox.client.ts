@@ -1,15 +1,13 @@
 class Combobox extends HTMLElement {
-	private readonly originalInputElement: Element | null;
-	private readonly comboboxElement: HTMLInputElement;
-	private readonly listboxElement: HTMLUListElement;
+	private readonly originalInputElement = this.firstElementChild;
+	private readonly comboboxElement = this.createCombobox(
+		this.firstElementChild,
+	);
+	private readonly listboxElement = this.createListbox();
 
+	// biome-ignore lint/complexity/noUselessConstructor: <explanation>
 	constructor() {
 		super();
-
-		this.originalInputElement = this.firstElementChild;
-
-		this.comboboxElement = this.createCombobox(this.firstElementChild);
-		this.listboxElement = this.createListbox();
 	}
 
 	connectedCallback() {
@@ -47,6 +45,7 @@ class Combobox extends HTMLElement {
 	}
 
 	private createCombobox(originalInput: Element | null) {
+		this.className = "combobox";
 		const combobox = document.createElement("input");
 
 		combobox.className = "combobox__input";
@@ -287,16 +286,16 @@ class Combobox extends HTMLElement {
 			return;
 		}
 		const href = selectedItem.dataset.href;
+		if (navigateOnSelect && href) {
+			location.href = href;
+			return;
+		}
 
 		const selectedText = selectedItem?.textContent?.trim();
 
 		if (selectedText) {
 			this.hideListbox();
 			this.comboboxElement.value = selectedText;
-		}
-
-		if (navigateOnSelect && href) {
-			// location.href = href;
 		}
 
 		this.comboboxElement.dispatchEvent(

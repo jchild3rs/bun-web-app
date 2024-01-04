@@ -9,8 +9,11 @@ export const postPartialRoute = new Route<{ id: string }>(
 	async ({ params }) => {
 		const id = parseInt(params.id);
 		const post = await postService.byId(id);
-		const user = await fetchUserById(post.userId);
+		const [user, photo] = await Promise.all([
+			fetchUserById(post.userId),
+			postService.photosByPostId(id),
+		]);
 
-		return new HtmlResponse(postView({ post, user }));
+		return new HtmlResponse(postView({ photo, post, user }));
 	},
 );

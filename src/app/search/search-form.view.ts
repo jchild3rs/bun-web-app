@@ -14,7 +14,7 @@ export const searchFormView = ({
 } = {}) => {
 	return `
 <form class="search-form" action="/search">
-	<label for="${id}" class="visually-hidden">${label || "Query"}</label>
+	<label for="${id}" class="sr-only">${label || "Query"}</label>
 	<enhanced-combobox 
 		endpoint="/partial/search-form-results" 
 		navigate-on-select
@@ -28,7 +28,6 @@ export const searchFormView = ({
 			required
 		/>
 	</enhanced-combobox>
-	<button tabindex="-1" type="submit">Search</button>
 </form>
 	`;
 };

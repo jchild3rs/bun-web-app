@@ -13,7 +13,10 @@ export const postPageRoute = new Route<{ id: string }>(
 	async ({ request, params }) => {
 		const id = parseInt(params.id);
 		const post = await postService.byId(id);
-		const user = await fetchUserById(post.userId);
+		const [user, photo] = await Promise.all([
+			fetchUserById(post.userId),
+			postService.photosByPostId(id),
+		]);
 
 		const meta = new Meta({
 			description: "",
@@ -25,7 +28,7 @@ export const postPageRoute = new Route<{ id: string }>(
 		return new HtmlTemplateResponse({
 			meta,
 
-			content: `<div class="content">${postView({ post, user })}</div>`,
+			content: postView({ post, user, photo }),
 		});
 	},
 );

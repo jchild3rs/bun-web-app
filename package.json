@@ -3,18 +3,16 @@
   "scripts": {
     "check": "biome check --apply src",
     "clean": "rm -rf dist",
-    "dev:client": "bun nodemon --ext .client.ts,.css,.html --exec \"rm -rf ./dist/static/js && bun bundle:client\" -w src",
-    "dev:server": "DEBUG=app:* bun --hot ./src/server.ts",
+    "dev:client": "bun nodemon --ext .client.ts,.css,.html --exec \"bun bundle:client\" -w src",
+    "dev:server": "bun --hot ./src/server.ts",
     "dev": "bun run bundle && bun conc --raw --kill-others bun:dev:*",
     "bundle": "bun bundle:client && bun bundle:server",
-    "bundle:client": "bun ./scripts/bundle-client.ts",
+    "bundle:client": "rm -rf ./dist/**/*.css ./dist/static/js && bun ./scripts/bundle-client.ts",
     "bundle:server": "bun ./scripts/bundle-server.ts",
     "start": "bun ./dist/server.js",
     "test": "bun test"
   },
   "dependencies": {
-    "@fontsource-variable/fira-code": "^5.0.16",
-    "@fontsource-variable/inter": "^5.0.16",
     "@testing-library/dom": "^9.3.3",
     "@testing-library/user-event": "^14.5.2",
     "debug": "^4.3.4",
@@ -26,17 +24,20 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
-    "@fontsource/playfair-display": "^5.0.18",
+    "@fontsource-variable/fira-code": "^5.0.16",
+    "@fontsource-variable/inter": "^5.0.16",
+    "@fontsource-variable/playfair-display": "^5.0.18",
     "@happy-dom/global-registrator": "^12.10.3",
     "@types/debug": "^4.1.12",
     "bun-types": "latest",
     "concurrently": "^8.2.2",
+    "cssnano": "^6.0.2",
     "nodemon": "^3.0.2",
     "open-props": "^1.6.16",
     "pino-pretty": "^10.3.1",
     "postcss": "^8.4.32",
-    "postcss-import": "^15.1.0",
-    "postcss-jit-props": "^1.0.14"
+    "postcss-jit-props": "^1.0.14",
+    "postcss-preset-env": "^9.3.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

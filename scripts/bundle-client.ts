@@ -1,14 +1,16 @@
-import path from "path";
 import fg from "fast-glob";
 import postcss from "postcss";
+import * as path from "path";
+import {BuildArtifact} from "bun";
 const log = require("debug")("app:bundle");
 
 const isDev = process.env.NODE_ENV !== "production";
 
 type ManifestEntry = {
 	path: string;
+	publicPath: string;
 	name: string;
-	kind: string;
+	kind: BuildArtifact['kind'] | 'stylesheet'
 	hash: string | null;
 	type: string;
 };
@@ -16,7 +18,7 @@ type ManifestEntry = {
 const OUTPUT_PATH = "./dist";
 
 async function copyFonts() {
-	const fontSourceFonts = ["inter", "fira-code"];
+	const fontSourceFonts = ["inter", "fira-code", "playfair-display" ];
 
 	await Bun.spawn(["mkdir", "-p", "./dist/static/fonts"]).exited;
 
@@ -31,27 +33,38 @@ async function copyFonts() {
 	log("Copied fonts");
 }
 
-const postcssJitProps = require("postcss-jit-props");
-const OpenProps = require("open-props");
-const atImport = require("postcss-import")
-const postcssCustomMedia = require('postcss-custom-media');
-
 async function buildCSS() {
-
-	const stylesheet = await Bun.file("./src/styles.css").text();
+	const srcPath = "./src/styles.css";
+	const destPath = `${OUTPUT_PATH}/static`;
+	const openPropsPostCSSConfig = require("open-props/postcss.config.cjs");
 	const plugins: postcss.AcceptedPlugin[] = [
-		atImport(),
-		postcssCustomMedia(),
-		postcssJitProps(OpenProps),
+		...openPropsPostCSSConfig.plugins,
+		require("postcss-jit-props")({
+			files: [
+				path.resolve(__dirname, '../node_modules/open-props/open-props.min.css'),
+			]
+		}),
 	];
-	const result = await postcss(plugins).process(stylesheet, {
-		from: "./src/styles.css",
-	});
 
-	await Bun.write(`${OUTPUT_PATH}/static/styles.css`, result.css);
-	// todo
+	const result = await postcss(plugins).process(
+		await Bun.file(srcPath).text(),
+		{
+			from: srcPath,
+			map: isDev ? { inline: true } : false,
+		},
+	);
+
+	const stylesHash = Bun.hash(result.css);
+	await Bun.write(`${destPath}/styles-${stylesHash}.css`, result.css);
+
+	log("Built CSS");
+
+	// await Bun.write(`${OUTPUT_PATH}/static/styles.css`, result.css);
+
+	return stylesHash;
 }
 
+const clientOutputFolder = "js/";
 async function buildJS() {
 	const entrypoints = await fg.glob(
 		["**/client.ts", "**/src/**/client/*.ts", "**/*.client.ts"],
@@ -68,8 +81,8 @@ async function buildJS() {
 		splitting: true,
 		minify: !isDev,
 		sourcemap: isDev ? "inline" : "none",
-		naming: "js/[name]-[hash].[ext]",
-		publicPath: "/js/",
+		naming: `${clientOutputFolder}[name]-[hash].[ext]`,
+		publicPath: `/${clientOutputFolder}`,
 	});
 
 	if (!clientResult.success) {
@@ -99,16 +112,24 @@ if (clientResult) {
 	for (const output of clientResult.outputs) {
 		manifest.push({
 			path: output.path,
-			name: output.path.split("/dist")[1],
+			name: output.path.split(`/dist/static/${clientOutputFolder}`)[1],
+			publicPath: output.path.split("/dist/static")[1],
 			kind: output.kind,
 			hash: output.hash,
 			type: output.type,
 		});
 	}
 
-	manifest.push({
+	const cssEntry: ManifestEntry = {
+		path: path.resolve(import.meta.dir, `../dist/static/styles-${stylesHash}.css`),
 		name: `styles-${stylesHash}.css`,
-	} as ManifestEntry);
+		publicPath: `/styles-${stylesHash}.css`,
+		kind: "stylesheet",
+		hash: `${stylesHash}`,
+		type: "text/css",
+	};
+
+	manifest.push(cssEntry);
 
 	// write manifest to disk
 	await Bun.write(
