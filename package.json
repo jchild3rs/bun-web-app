@@ -36,6 +36,7 @@
     "open-props": "^1.6.16",
     "pino-pretty": "^10.3.1",
     "postcss": "^8.4.32",
+    "postcss-import": "^16.0.0",
     "postcss-jit-props": "^1.0.14",
     "postcss-preset-env": "^9.3.0"
   },
